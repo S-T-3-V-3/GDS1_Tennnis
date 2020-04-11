@@ -13,16 +13,22 @@ public class PlayerController : MonoBehaviour
     public PlayerSelection playerSelection;
     public float baseSpeed = 3f;
 
+    public MeshRenderer playerRenderer;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-
+        playerRenderer = GetComponent<MeshRenderer>();
     }
 
     void FixedUpdate()
     {
         MovementController();
+    }
+
+    public void SetColor(PlayerColors color)
+    {
+        playerRenderer.material = color.playerColor;
     }
 
     void MovementController()

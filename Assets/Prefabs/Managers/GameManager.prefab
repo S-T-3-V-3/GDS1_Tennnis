@@ -53,6 +53,7 @@ MonoBehaviour:
     type: 3}
   player2Prefab: {fileID: 7454911629345750927, guid: d57613cca3c6143b8bd63928bd88ca31,
     type: 3}
+  gameSettings: {fileID: 11400000, guid: 2d9249ab010ae443cb7d48bb7d305b04, type: 2}
   OnLevelStart:
     m_PersistentCalls:
       m_Calls: []
