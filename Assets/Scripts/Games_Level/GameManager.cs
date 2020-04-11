@@ -16,6 +16,8 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public int scoreP2;
     [HideInInspector] public int setWinsP2;
 
+    public GameObject ballPrefab;
+
     PlayerColors color1;
     PlayerColors color2;
 
@@ -52,16 +54,19 @@ public class GameManager : MonoBehaviour
     {
         color1 = SelectColor();
         color2 = SelectColor();
+        GameObject ballInstance = Instantiate(ballPrefab) as GameObject;
         
         GameObject player1 = Instantiate(player1Prefab, nearestRespawn.position, nearestRespawn.rotation) as GameObject;
         PlayerController player1Controller = player1.GetComponent<PlayerController>();
         player1Controller.playerSelection = PlayerController.PlayerSelection.Player1;
         player1Controller.SetColor(color1);
+        player1Controller.ballTarget = ballInstance;
 
         GameObject player2 = Instantiate(player2Prefab, farthestRespawn.position, farthestRespawn.rotation) as GameObject;
         PlayerController player2Controller = player2.GetComponent<PlayerController>();
         player2Controller.playerSelection = PlayerController.PlayerSelection.Player2;
         player2Controller.SetColor(color2);
+        player2Controller.ballTarget = ballInstance;
     }
 
     private PlayerColors SelectColor()

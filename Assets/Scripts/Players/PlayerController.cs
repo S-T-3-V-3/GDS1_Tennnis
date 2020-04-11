@@ -10,19 +10,22 @@ public class PlayerController : MonoBehaviour
         Player2
     }
 
+    public GameObject playerModel;
+    public GameObject ballTarget;
     public PlayerSelection playerSelection;
     public float baseSpeed = 3f;
 
-    public MeshRenderer playerRenderer;
+    MeshRenderer playerRenderer;
 
     // Start is called before the first frame update
     void Awake()
     {
-        playerRenderer = GetComponent<MeshRenderer>();
+        playerRenderer = playerModel.GetComponent<MeshRenderer>();
     }
 
     void FixedUpdate()
     {
+        LookAtBall();
         MovementController();
     }
 
@@ -98,6 +101,19 @@ public class PlayerController : MonoBehaviour
             float movementY = baseSpeed * -1;
             transform.position += transform.forward * movementY * Time.fixedDeltaTime;
         }
+    }
 
+    void LookAtBall()
+    {
+        if(ballTarget != null)
+        {
+            /*Vector3 direction = ballTarget.transform.position - playerModel.transform.position;
+            Quaternion lookRot = Quaternion.LookRotation(direction) * Quaternion.AngleAxis(90, Vector3.up);
+            playerModel.transform.localRotation = lookRot;*/
+
+            Vector3 difference = ballTarget.transform.position - playerModel.transform.position;
+            float rotationY = Mathf.Atan2(difference.x, difference.z) * Mathf.Rad2Deg;
+            playerModel.transform.localRotation = Quaternion.Euler(0, rotationY, 0);
+        }
     }
 }
