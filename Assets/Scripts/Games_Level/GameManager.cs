@@ -9,6 +9,14 @@ public class GameManager : MonoBehaviour
 
     public static GameManager instance = null;
 
+    public enum GamePlay
+    {
+        SinglePlayer,
+        DoublePlayer
+    }
+
+    public GamePlay currentPlaymode = GamePlay.SinglePlayer;
+
     //Test temporary variables
     [HideInInspector] public int scoreP1;
     [HideInInspector] public int setWinsP1;
@@ -16,7 +24,7 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public int scoreP2;
     [HideInInspector] public int setWinsP2;
 
-    public GameObject ballPrefab;
+    public GameObject ballPrefab; //Replace with real ball
 
     PlayerColors color1;
     PlayerColors color2;
@@ -28,6 +36,7 @@ public class GameManager : MonoBehaviour
 
     public GameObject player1Prefab;
     public GameObject player2Prefab;
+    public GameObject AiPlayerPrefab;
 
     [Header("Game Settings")]
     public GameSettings gameSettings;
@@ -52,10 +61,36 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (currentPlaymode == GamePlay.SinglePlayer)
+            SinglePlayerSpawn();
+        else
+            TwoPlayerSpawn();
+    }
+
+    private void SinglePlayerSpawn()
+    {
         color1 = SelectColor();
         color2 = SelectColor();
         GameObject ballInstance = Instantiate(ballPrefab) as GameObject;
-        
+
+        GameObject player1 = Instantiate(player1Prefab, nearestRespawn.position, nearestRespawn.rotation) as GameObject;
+        PlayerController player1Controller = player1.GetComponent<PlayerController>();
+        player1Controller.playerSelection = PlayerController.PlayerSelection.Player1;
+        player1Controller.SetColor(color1);
+        player1Controller.ballTarget = ballInstance;
+
+        GameObject AiPlayer2 = Instantiate(AiPlayerPrefab, farthestRespawn.position, farthestRespawn.rotation) as GameObject;
+        AIController AiPlayerController = AiPlayer2.GetComponent<AIController>();
+        AiPlayerController.SetColor(color2);
+        AiPlayerController.ballTarget = ballInstance;
+    }
+
+    private void TwoPlayerSpawn()
+    {
+        color1 = SelectColor();
+        color2 = SelectColor();
+        GameObject ballInstance = Instantiate(ballPrefab) as GameObject;
+
         GameObject player1 = Instantiate(player1Prefab, nearestRespawn.position, nearestRespawn.rotation) as GameObject;
         PlayerController player1Controller = player1.GetComponent<PlayerController>();
         player1Controller.playerSelection = PlayerController.PlayerSelection.Player1;

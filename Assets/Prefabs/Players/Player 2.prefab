@@ -48,7 +48,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 1
-  m_Constraints: 112
+  m_Constraints: 122
   m_CollisionDetection: 1
 --- !u!114 &5767007868552822356
 MonoBehaviour:
@@ -63,6 +63,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerModel: {fileID: 9214401476600585797}
+  ballTarget: {fileID: 0}
   playerSelection: 0
   baseSpeed: 14
 --- !u!65 &1056031525271173914
