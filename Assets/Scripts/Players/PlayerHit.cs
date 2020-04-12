@@ -16,7 +16,8 @@ public class PlayerHit : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
     }
 
-    private void Update()
+    //Used to help deterimine angle in which the ball was sent
+    /*private void Update()
     {
         if(playerModel.transform.position.z < 0)
         {
@@ -26,7 +27,7 @@ public class PlayerHit : MonoBehaviour
         {
             Debug.Log("Player 2: " + playerModel.transform.localRotation);
         }     
-    }
+    }*/
 
     private void OnCollisionEnter(Collision collision)
     {
