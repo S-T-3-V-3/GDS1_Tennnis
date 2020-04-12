@@ -13,6 +13,8 @@ public class Ball_Behaviour : MonoBehaviour
     void Start()
     {
         ballRigidbody = GetComponent<Rigidbody>();
+        //Sorting layer 8 = Player boundries, 9 = ball
+        Physics.IgnoreLayerCollision(8, 9);
     }
 
     // Update is called once per frame
