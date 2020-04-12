@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
     public GameObject ballTarget;
     public PlayerSelection playerSelection;
     public float baseSpeed = 3f;
+    public float controlModifier = 1;
 
     MeshRenderer playerRenderer;
 
@@ -82,23 +83,23 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.A))
         {
-            float movementX = baseSpeed * -1;
+            float movementX = baseSpeed * -1 * controlModifier;
             transform.position += transform.right * movementX * Time.fixedDeltaTime;
         }
         else if (Input.GetKey(KeyCode.D))
         {
-            float movementX = baseSpeed * 1;
+            float movementX = baseSpeed * 1 * controlModifier;
             transform.position += transform.right * movementX * Time.fixedDeltaTime;
         }
 
         if (Input.GetKey(KeyCode.W))
         {
-            float movementY = baseSpeed * 1;
+            float movementY = baseSpeed * 1 * controlModifier;
             transform.position += transform.forward * movementY * Time.fixedDeltaTime;
         }
         else if (Input.GetKey(KeyCode.S))
         {
-            float movementY = baseSpeed * -1;
+            float movementY = baseSpeed * -1 * controlModifier;
             transform.position += transform.forward * movementY * Time.fixedDeltaTime;
         }
     }
