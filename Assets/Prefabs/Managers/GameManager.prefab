@@ -47,13 +47,14 @@ MonoBehaviour:
   setWinsP1: 0
   scoreP2: 0
   setWinsP2: 0
-  ballPrefab: {fileID: 6570949132859912473, guid: 1443d739d16bef546a45b88f9a50292e,
-    type: 3}
+  ballPrefab: {fileID: 0}
   nearestRespawn: {fileID: 0}
   farthestRespawn: {fileID: 0}
   player1Prefab: {fileID: 3353611130697008694, guid: c7675d626f4bd41a0a4d92c757d232c0,
     type: 3}
   player2Prefab: {fileID: 7454911629345750927, guid: d57613cca3c6143b8bd63928bd88ca31,
+    type: 3}
+  AiPlayerPrefab: {fileID: 7454911629345750927, guid: 0e97259fef4084dfc98e659a68e932b6,
     type: 3}
   gameSettings: {fileID: 11400000, guid: 2d9249ab010ae443cb7d48bb7d305b04, type: 2}
   OnLevelStart:
