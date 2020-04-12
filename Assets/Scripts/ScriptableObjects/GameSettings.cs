@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu (menuName = "Object Settings/ Game Settings")]
@@ -24,4 +23,9 @@ public struct PlayerColors
     public Material playerColor;
     public Material groundColor;
     public Color textColour;
+}
+
+public enum Team {
+    GREEN,
+    BLUE
 }
