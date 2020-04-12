@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Ball_Collisions : MonoBehaviour
+public class FloorCollision : MonoBehaviour
 {
     public AudioSource audioSource;
 
@@ -13,7 +13,7 @@ public class Ball_Collisions : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if(collision.gameObject.tag == "Floor")
+        if (collision.gameObject.GetComponent<BallBehaviour>() == null) return;
         {
             audioSource.Play();
         }
