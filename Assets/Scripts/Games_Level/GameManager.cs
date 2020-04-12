@@ -31,9 +31,19 @@ public class GameManager : MonoBehaviour
 
     //Additional Temporary Variables
     //Make Sure to insert these variables
-    public Transform nearestRespawn; //This can be stored into a scriptable object
-    public Transform farthestRespawn;
+    [Header("Respawn")]
+    public Transform player1Spawn; //This can be stored into a scriptable object
+    public Transform player2Spawn;
+    public Transform ballSpawnPos;
 
+    [Header("Camera")]
+    public Camera mainCamera;
+
+    [Header("Camera Positions")]
+    public Transform cameraPosition1;
+    public Transform cameraPosition2;
+
+    [Header("Playable Prefabs")]
     public GameObject player1Prefab;
     public GameObject player2Prefab;
     public GameObject AiPlayerPrefab;
@@ -48,6 +58,14 @@ public class GameManager : MonoBehaviour
 
     public List<PlayerColors> playerColors;
 
+    GameObject player1;
+    GameObject player2;
+
+    PlayerController player1Controller;
+    PlayerController player2Controller;
+
+    bool camViewInPos2 = false;
+
     void Awake()
     {
         if(instance != null)
@@ -58,7 +76,6 @@ public class GameManager : MonoBehaviour
         playerColors = new List<PlayerColors>(gameSettings.colorList);
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         if (currentPlaymode == GamePlay.SinglePlayer)
@@ -73,16 +90,16 @@ public class GameManager : MonoBehaviour
         color2 = SelectColor();
         GameObject ballInstance = Instantiate(ballPrefab) as GameObject;
 
-        GameObject player1 = Instantiate(player1Prefab, nearestRespawn.position, nearestRespawn.rotation) as GameObject;
-        PlayerController player1Controller = player1.GetComponent<PlayerController>();
+        player1 = Instantiate(player1Prefab, player1Spawn.position, player1Spawn.rotation) as GameObject;
+        player1Controller = player1.GetComponent<PlayerController>();
         player1Controller.playerSelection = PlayerController.PlayerSelection.Player1;
         player1Controller.SetColor(color1);
         player1Controller.ballTarget = ballInstance;
 
-        GameObject AiPlayer2 = Instantiate(AiPlayerPrefab, farthestRespawn.position, farthestRespawn.rotation) as GameObject;
-        AIController AiPlayerController = AiPlayer2.GetComponent<AIController>();
-        AiPlayerController.SetColor(color2);
-        AiPlayerController.ballTarget = ballInstance;
+        player2 = Instantiate(AiPlayerPrefab, player2Spawn.position, player2Spawn.rotation) as GameObject;
+        AIController player2Controller = player2.GetComponent<AIController>();
+        player2Controller.SetColor(color2);
+        player2Controller.ballTarget = ballInstance;
     }
 
     private void TwoPlayerSpawn()
@@ -91,14 +108,14 @@ public class GameManager : MonoBehaviour
         color2 = SelectColor();
         GameObject ballInstance = Instantiate(ballPrefab) as GameObject;
 
-        GameObject player1 = Instantiate(player1Prefab, nearestRespawn.position, nearestRespawn.rotation) as GameObject;
-        PlayerController player1Controller = player1.GetComponent<PlayerController>();
+        player1 = Instantiate(player1Prefab, player1Spawn.position, player1Spawn.rotation) as GameObject;
+        player1Controller = player1.GetComponent<PlayerController>();
         player1Controller.playerSelection = PlayerController.PlayerSelection.Player1;
         player1Controller.SetColor(color1);
         player1Controller.ballTarget = ballInstance;
 
-        GameObject player2 = Instantiate(player2Prefab, farthestRespawn.position, farthestRespawn.rotation) as GameObject;
-        PlayerController player2Controller = player2.GetComponent<PlayerController>();
+        player2 = Instantiate(player2Prefab, player2Spawn.position, player2Spawn.rotation) as GameObject;
+        player2Controller = player2.GetComponent<PlayerController>();
         player2Controller.playerSelection = PlayerController.PlayerSelection.Player2;
         player2Controller.SetColor(color2);
         player2Controller.ballTarget = ballInstance;
@@ -115,7 +132,7 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        ChangeCameraPositions();
     }
 
     void ShowMainMenu()
@@ -128,8 +145,67 @@ public class GameManager : MonoBehaviour
 
     }
 
-    void ResetMatch()
+    //Resets Scene for next match
+    void ResetNextMatch()
     {
+        player1.transform.position = player1Spawn.position;
+        player1.transform.rotation = player1Spawn.rotation;
 
+        player2.transform.position = player2Spawn.position;
+        player2.transform.rotation = player2Spawn.rotation;
+
+        if (!camViewInPos2)
+        {
+            mainCamera.transform.position = cameraPosition2.position;
+            mainCamera.transform.rotation = cameraPosition2.rotation;
+            InvertSingleController();
+            InvertingDoubleController();
+        }
+        else
+        {
+            mainCamera.transform.position = cameraPosition1.position;
+            mainCamera.transform.rotation = cameraPosition1.rotation;
+            InvertSingleController();
+            InvertingDoubleController();
+        }
+    }
+
+    private void InvertSingleController()
+    {
+        if (currentPlaymode == GamePlay.SinglePlayer)
+        {
+            player1Controller.controlModifier *= -1;
+        }
+    }
+
+    private void InvertingDoubleController()
+    {
+        if (currentPlaymode == GamePlay.DoublePlayer)
+        {
+            player1Controller.controlModifier *= -1;
+            player2Controller.controlModifier *= -1;
+        }
+    }
+
+    //Test Methods
+    void ChangeCameraPositions()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            mainCamera.transform.position = cameraPosition1.position;
+            mainCamera.transform.rotation = cameraPosition1.rotation;
+
+            InvertSingleController();
+            InvertingDoubleController();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            mainCamera.transform.position = cameraPosition2.position;
+            mainCamera.transform.rotation = cameraPosition2.rotation;
+
+            InvertSingleController();
+            InvertingDoubleController();
+        }
     }
 }
