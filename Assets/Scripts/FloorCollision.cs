@@ -4,7 +4,11 @@ using UnityEngine;
 
 public class FloorCollision : MonoBehaviour
 {
-    public AudioSource audioSource;
+    //Set in inspector window
+    public ScoreboardManager scoreboardManager;
+    public bool isInnerCourt;
+
+    public AudioSource audioSource; 
 
     void Start()
     {
@@ -16,6 +20,7 @@ public class FloorCollision : MonoBehaviour
         if (collision.gameObject.GetComponent<BallBehaviour>() == null) return;
         {
             audioSource.Play();
+            scoreboardManager.AddBounceCounter(isInnerCourt, collision.gameObject.transform.position.z);
         }
     }
 }
