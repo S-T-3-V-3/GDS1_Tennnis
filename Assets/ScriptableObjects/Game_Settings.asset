@@ -21,3 +21,8 @@ MonoBehaviour:
     playerColor: {fileID: 2100000, guid: 840c058e6113e4078b35f9c8d1d91bb8, type: 2}
     groundColor: {fileID: 0}
     textColour: {r: 0, g: 0, b: 0, a: 0}
+  scoreValues: []
+  predictionDistanceScalar: 2
+  baseHitPower: 5
+  powerupSpeedMultiplier: 1.5
+  maxBallVelocity: 100

@@ -15,27 +15,30 @@ public class BallBehaviour : MonoBehaviour
         ballRigidbody = GetComponent<Rigidbody>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void ReturnBall(Transform playerTransform, float xDirectionModifier)
     {
-        if (Input.GetKeyDown(KeyCode.Mouse0)){
-            SendUpwards();
-        }
-        if (Input.GetKeyDown(KeyCode.Mouse1))
+        ballRigidbody.velocity = Vector3.zero;
+        switch (playerTransform.position.z)
         {
-            SendDownwards();
+            case float z when (z < -14):
+                ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y, ballForces.z * playerTransform.forward.z));
+                break;
+            case float z when (z >= -14 && z < -7):
+                ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y / 1.5f, ballForces.z * playerTransform.forward.z));
+                break;
+            case float z when (z >= -7 && z < 0):
+                ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y / 2, ballForces.z * playerTransform.forward.z));
+                break;
+            case float z when (z >= 0 && z < 7):
+                ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y / 2, -ballForces.z * playerTransform.forward.z));
+                break;
+            case float z when (z >= 7 && z < 14):
+                ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y / 1.5f, -ballForces.z * playerTransform.forward.z));
+                break;
+            case float z when (z >= 14):
+                ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y, -ballForces.z * playerTransform.forward.z));
+                break;
         }
     }
 
-    private void SendUpwards()
-    {
-        ballRigidbody.velocity = Vector3.zero;
-        ballRigidbody.AddForce(ballForces);
-    }
-
-    private void SendDownwards()
-    {
-        ballRigidbody.velocity = Vector3.zero;
-        ballRigidbody.AddForce(new Vector3(ballForces.x, ballForces.y, -ballForces.z));
-    }
 }
