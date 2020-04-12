@@ -23,9 +23,10 @@ public struct PlayerColors
     public Material playerColor;
     public Material groundColor;
     public Color textColour;
+    public Team team;
 }
 
 public enum Team {
-    GREEN,
+    RED,
     BLUE
 }

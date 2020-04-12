@@ -4,9 +4,9 @@
 public class ScoreEvent : UnityEvent<Score> {};
 
 public class Score {
-    public int greenGameScore;
+    public int redGameScore;
     public int blueGameScore;
-    public int greenSetScore;
+    public int redSetScore;
     public int blueSetScore;
 
     public string scoreStatusText;
@@ -17,37 +17,38 @@ public class Score {
     public void Reset()
     {
         OnScoreUpdated = new ScoreEvent();
+        OnGameCompleted = new UnityEvent();
 
-        greenGameScore = 0;
+        redGameScore = 0;
         blueGameScore = 0;
-        greenSetScore = 0;
+        redSetScore = 0;
         blueSetScore = 0;
     }
 
     public void NewSet()
     {
-        greenGameScore = 0;
+        redGameScore = 0;
         blueGameScore = 0;
     }
 
     public void AddScore(Team team)
     {
-        if (team == Team.GREEN) {
-            if (greenGameScore < 3 || greenGameScore <= blueGameScore) {
-                greenGameScore++;
+        if (team == Team.RED) {
+            if (redGameScore < 3 || redGameScore <= blueGameScore) {
+                redGameScore++;
             }
-            else if (greenGameScore > blueGameScore) {
-                greenSetScore++;
-                if (greenSetScore >= 6)
+            else if (redGameScore > blueGameScore) {
+                redSetScore++;
+                if (redSetScore >= 6)
                     OnGameCompleted.Invoke();
                 NewSet();
             }
         }
         else if (team == Team.BLUE) {
-            if (blueGameScore < 3 || blueGameScore <= greenGameScore) {
+            if (blueGameScore < 3 || blueGameScore <= redGameScore) {
                 blueGameScore++;
             }
-            else if (blueGameScore > greenGameScore) {
+            else if (blueGameScore > redGameScore) {
                 blueSetScore++;
                 if (blueSetScore >= 6)
                     OnGameCompleted.Invoke();
@@ -55,12 +56,12 @@ public class Score {
             }
         }
 
-        if (greenGameScore >= 3 && blueGameScore >= 3) {
-            if (greenGameScore == blueGameScore)
+        if (redGameScore >= 3 && blueGameScore >= 3) {
+            if (redGameScore == blueGameScore)
                 scoreStatusText = "Deuce";
-            else if (greenGameScore > blueGameScore)
+            else if (redGameScore > blueGameScore)
                 scoreStatusText = "<color=green>Advantage</color>";
-            else if (blueGameScore > greenGameScore)
+            else if (blueGameScore > redGameScore)
                 scoreStatusText = "<color=blue>Advantage</color>";
         }
         else

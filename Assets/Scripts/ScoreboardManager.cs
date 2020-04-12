@@ -16,13 +16,26 @@ public class ScoreboardManager : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
     }
 
-    public void PointScored(int playerNumber)
+    public void PointScored(int lastHitter)
     {
-        //TODO: ADD SCORE TO UI MENU WITH playerNumber
+        // ===================================
+        // This should be the param passed in
+        // instead of an integer
+        Team team = Team.BLUE;
+        // The code below will then handle the
+        // scoring/rest of game based on the
+        // team that scored.
+        // ===================================
+
+        GameManager.Instance.OnPlayerScore.Invoke(team);
+
+        // ========================================
         //TODO: CHECK IF GAME POINT IS MADE
         //TODO: CHECK IF DUECE OCCURS
+        // The score class handles all of this! :) 
+        // Go take a look and see if you need to make any changes
+        // ========================================
 
-        Debug.Log("Player "+playerNumber+" Scored");
         audioSource.Play();
 
         //TODO: RESET ROUND
