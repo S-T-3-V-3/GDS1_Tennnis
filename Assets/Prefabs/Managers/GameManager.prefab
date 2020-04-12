@@ -47,6 +47,8 @@ MonoBehaviour:
   setWinsP1: 0
   scoreP2: 0
   setWinsP2: 0
+  ballPrefab: {fileID: 6570949132859912473, guid: 1443d739d16bef546a45b88f9a50292e,
+    type: 3}
   nearestRespawn: {fileID: 0}
   farthestRespawn: {fileID: 0}
   player1Prefab: {fileID: 3353611130697008694, guid: c7675d626f4bd41a0a4d92c757d232c0,
@@ -63,3 +65,4 @@ MonoBehaviour:
   OnRoundEnd:
     m_PersistentCalls:
       m_Calls: []
+  playerColors: []

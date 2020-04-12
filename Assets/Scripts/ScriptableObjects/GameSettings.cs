@@ -7,6 +7,14 @@ public class GameSettings : ScriptableObject
 {
     [Header("Colour Selection")]
     public List<PlayerColors> colorList;
+
+    [Header("Game Variables")]
+    public List<string> scoreValues;
+    [Range(0,100)]
+    public float predictionDistanceScalar = 2f;
+    public float baseHitPower = 5f;
+    public float powerupSpeedMultiplier = 1.5f;
+    public float maxBallVelocity = 100f;
 }
 
 [System.Serializable]
