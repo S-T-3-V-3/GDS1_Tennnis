@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     public GameObject playerModel;
     public GameObject ballTarget;
     public PlayerSelection playerSelection;
+    public Team currentTeam;
     public float baseSpeed = 3f;
     public float controlModifier = 1;
 

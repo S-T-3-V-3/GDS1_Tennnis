@@ -7,7 +7,6 @@ public class AIController : MonoBehaviour
     public GameObject playerModel;
 
     public GameObject ballTarget;
-    public Ball_Launch ballScript;
     Rigidbody ballRB;
 
     public float boundXLimit;
@@ -17,6 +16,7 @@ public class AIController : MonoBehaviour
     MeshRenderer meshRenderer;
     private float futureScalar = 0.7f;
     private Vector3 futurePosition;
+    public Team currentTeam;
 
     bool hasSetFuture = false;
 
