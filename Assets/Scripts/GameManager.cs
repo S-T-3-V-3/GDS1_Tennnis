@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     public GamePlay currentPlaymode = GamePlay.SinglePlayer;
 
     [Header("Prefabs")]
+    public GameObject AudioPrefab;
     public GameObject player1Prefab;
     public GameObject player2Prefab;
     public GameObject AiPlayerPrefab;
@@ -17,6 +18,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Scene Components")]
     public HUDManager hud;
+    public GameObject AudioManager;
 
     [HideInInspector]
     public GameObject currentBall;  
@@ -71,17 +73,19 @@ public class GameManager : MonoBehaviour
 
         playerColors = new List<PlayerColors>(gameSettings.colorList);
 
+        AudioManager = GameObject.Instantiate(AudioPrefab);
+
+        OnRoundComplete.AddListener(StartNewRound);
+        OnSetComplete.AddListener(StartNewSet);
+        OnSetComplete.AddListener(TriggerPowerupSpawner);
         OnGameComplete.AddListener(ShowGameCompleted);
     }
 
     void Start()
     {
-        OnRoundComplete.AddListener(StartNewRound);
-        OnSetComplete.AddListener(StartNewMatch);
-        OnSetComplete.AddListener(TriggerPowerupSpawner);
-
         Spawn(currentPlaymode == GamePlay.SinglePlayer ? false : true);
-        StartNewMatch();
+        sessionData.StartGame();
+        StartNewSet();
     }
 
     void SpawnBall(Vector3 pos) {
@@ -190,7 +194,7 @@ public class GameManager : MonoBehaviour
     #endregion
 
     //Resets Scene for next match
-    public void StartNewMatch()
+    public void StartNewSet()
     {
         player1.transform.position = player1Spawn.position;
         player1.transform.rotation = player1Spawn.rotation;
@@ -213,7 +217,6 @@ public class GameManager : MonoBehaviour
             camViewInPos2 = false;
         }
 
-        sessionData.StartGame();
         StartNewRound();
     }
 
@@ -221,7 +224,7 @@ public class GameManager : MonoBehaviour
         Team currentServer = sessionData.GetCurrentServer();
         Transform currentServerTransform = player1Controller.currentTeam == currentServer ? player1.transform : player2.transform;
 
-        Vector3 ballSpawnPos = currentServerTransform.position + currentServerTransform.forward * gameSettings.ballSpawnDistance + new Vector3(0,1,0);
+        Vector3 ballSpawnPos = currentServerTransform.position + currentServerTransform.forward * gameSettings.ballSpawnDistance + new Vector3(0,0.4f,0);
         SpawnBall(ballSpawnPos);
     }
 

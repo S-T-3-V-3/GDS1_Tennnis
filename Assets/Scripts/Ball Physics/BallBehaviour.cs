@@ -6,55 +6,117 @@ public class BallBehaviour : MonoBehaviour
 {
     private Rigidbody ballRigidbody;
 
-    //Used for the scoreboard to reset bounces and detect who's scoring
-    private ScoreboardManager scoreboardManager;
-
     //ballAngle Inspector Test Case: 400x, 400y, 800z
     public Vector3 ballForces;
+
+    //Bounce detects the number of ball bounces, used in s
+    private float bounce = 0;
+    private bool stillScoring = true;
+
+    //Stores the player number of the last ball hitter
+    private Team lastHitter = Team.BLUE;
+
+    public enum PlayerPosition
+    {
+        TopPosition,
+        BottomPosition
+    }
 
     // Start is called before the first frame update
     void Start()
     {
         ballRigidbody = GetComponent<Rigidbody>();
-        scoreboardManager = GameObject.FindObjectOfType<ScoreboardManager>();
         ballRigidbody.useGravity = false;
     }
 
-    public void ReturnBall(Transform playerTransform, float xDirectionModifier)
+    //Send the ball back to the other side. Detected in player hit collision
+    public void ReturnBall(Transform playerTransform, float xDirectionModifier, Team currentTeam)
     {
         if(!ballRigidbody.useGravity)
             ballRigidbody.useGravity = true;
 
         ballRigidbody.velocity = Vector3.zero;
-        scoreboardManager.ResetBounceCounter();
+        ResetBounceCounter();
 
         switch (playerTransform.position.z)
         {
             case float z when (z < -14):
                 ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y, ballForces.z * playerTransform.forward.z));
-                scoreboardManager.PlayerOneHit(true);
                 break;
             case float z when (z >= -14 && z < -7):
                 ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y / 1.5f, ballForces.z * playerTransform.forward.z));
-                scoreboardManager.PlayerOneHit(true);
                 break;
             case float z when (z >= -7 && z < 0):
                 ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y / 2, ballForces.z * playerTransform.forward.z));
-                scoreboardManager.PlayerOneHit(true);
                 break;
             case float z when (z >= 0 && z < 7):
                 ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y / 2, -ballForces.z * playerTransform.forward.z));
-                scoreboardManager.PlayerOneHit(false);
                 break;
             case float z when (z >= 7 && z < 14):
                 ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y / 1.5f, -ballForces.z * playerTransform.forward.z));
-                scoreboardManager.PlayerOneHit(false);
                 break;
             case float z when (z >= 14):
-                ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y, -ballForces.z * playerTransform.forward.z));
-                scoreboardManager.PlayerOneHit(false);
+                ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y, -ballForces.z * playerTransform.forward.z));  
                 break;
+        }
+        lastHitter = currentTeam;
+    }
+
+    // Once a point is scored, inform game manager of point update
+    public void PointScored(Team pointScorer)
+    {
+        stillScoring = false;
+        GameManager.Instance.OnPlayerScore.Invoke(pointScorer);
+
+        GameManager.Instance.AudioManager.GetComponent<AudioManager>().PlaySound("Score");
+
+        //TODO: RESET ROUND
+        //TODO: SET stillScoring BACK TO TRUE
+    }
+
+    public void ResetBounceCounter()
+    {
+        if (stillScoring)
+            bounce = 0;
+    }
+
+    public void UpdateHitter(Team newHitter)
+    {
+        lastHitter = newHitter;
+    }
+
+    //Adds to bounce counter but also checks scoring criteria
+    public void AddBounceCounter(bool insideCourt, float zBallPosition)
+    {
+        if (stillScoring)
+        {
+            bounce++;
+            //If the ball lands outside the court without bouncing first, give opposition to the hitter the point
+            if (!insideCourt && bounce < 2)
+                ScoreOpposition();
+            
+
+            //If ball doesn't make it over the net, score the opposition
+            if (insideCourt && bounce < 2)
+            {
+                if (zBallPosition > 0 && GameManager.Instance.player1Prefab.transform.position.z > 0 ||
+                    zBallPosition < 0 && GameManager.Instance.player1Prefab.transform.position.z < 0)
+                {
+                    ScoreOpposition();
+                }
+            }
+
+            //If the ball bounces twice on a player's side, give point to opposition
+            if (bounce == 2)
+            {
+                PointScored(lastHitter);
+            }
         }
     }
 
+    //Changes the point scorer to the opposition
+    private void ScoreOpposition()
+    {
+        PointScored(lastHitter == Team.GREEN ? Team.BLUE : Team.GREEN);
+    }
 }

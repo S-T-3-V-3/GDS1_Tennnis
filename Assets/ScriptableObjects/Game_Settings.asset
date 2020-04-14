@@ -32,4 +32,4 @@ MonoBehaviour:
   baseHitPower: 5
   powerupSpeedMultiplier: 1.5
   maxBallVelocity: 100
-  ballSpawnDistance: 5
+  ballSpawnDistance: 3

@@ -450,9 +450,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: efdca0c71f5396c47a68df443e1d6d91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreboardManager: {fileID: 1666354832}
   isInnerCourt: 0
-  audioSource: {fileID: 0}
 --- !u!1 &718621117
 GameObject:
   m_ObjectHideFlags: 0
@@ -500,9 +498,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: efdca0c71f5396c47a68df443e1d6d91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreboardManager: {fileID: 1666354832}
   isInnerCourt: 0
-  audioSource: {fileID: 0}
 --- !u!82 &718621120
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1109,9 +1105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: efdca0c71f5396c47a68df443e1d6d91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreboardManager: {fileID: 1666354832}
   isInnerCourt: 0
-  audioSource: {fileID: 0}
 --- !u!1 &1396953274
 GameObject:
   m_ObjectHideFlags: 0
@@ -1466,9 +1460,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: efdca0c71f5396c47a68df443e1d6d91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreboardManager: {fileID: 1666354832}
   isInnerCourt: 1
-  audioSource: {fileID: 0}
 --- !u!1 &1616042657
 GameObject:
   m_ObjectHideFlags: 0
@@ -1586,7 +1578,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50ed71475e98dce46a68761105ae3bec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioSource: {fileID: 0}
 --- !u!4 &1666354833
 Transform:
   m_ObjectHideFlags: 0
@@ -1936,9 +1927,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: efdca0c71f5396c47a68df443e1d6d91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreboardManager: {fileID: 1666354832}
   isInnerCourt: 1
-  audioSource: {fileID: 0}
 --- !u!1 &1903647984
 GameObject:
   m_ObjectHideFlags: 0
@@ -2142,9 +2131,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: efdca0c71f5396c47a68df443e1d6d91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreboardManager: {fileID: 1666354832}
   isInnerCourt: 0
-  audioSource: {fileID: 0}
 --- !u!1 &1941779612
 GameObject:
   m_ObjectHideFlags: 0
@@ -2440,12 +2427,6 @@ PrefabInstance:
       propertyPath: farthestRespawn
       value: 
       objectReference: {fileID: 1537752233}
-    - target: {fileID: 8709986513965576687, guid: 556b7c79758fe49eb922dde31ea7707b,
-        type: 3}
-      propertyPath: ballPrefab
-      value: 
-      objectReference: {fileID: 8992460739632003145, guid: 8b5ad5b75325ee6449f3fc2cf991d339,
-        type: 3}
     - target: {fileID: 8709986513965576687, guid: 556b7c79758fe49eb922dde31ea7707b,
         type: 3}
       propertyPath: hud
