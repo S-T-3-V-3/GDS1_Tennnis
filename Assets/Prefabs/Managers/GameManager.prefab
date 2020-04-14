@@ -47,17 +47,15 @@ MonoBehaviour:
   currentPlaymode: 0
   AudioPrefab: {fileID: 1013733896255526557, guid: a8dea6a0b108d974ca9cb27c84f01e48,
     type: 3}
-  player1Prefab: {fileID: 3353611130697008694, guid: c7675d626f4bd41a0a4d92c757d232c0,
-    type: 3}
-  player2Prefab: {fileID: 7454911629345750927, guid: d57613cca3c6143b8bd63928bd88ca31,
-    type: 3}
-  AiPlayerPrefab: {fileID: 7454911629345750927, guid: 0e97259fef4084dfc98e659a68e932b6,
+  playerPrefab: {fileID: 3353611130697008694, guid: 4d5ffdd03c1405c43a227111f4d98e9b,
     type: 3}
   ballPrefab: {fileID: 8992460739632003145, guid: 8b5ad5b75325ee6449f3fc2cf991d339,
     type: 3}
   hud: {fileID: -7086576523414467012, guid: cadb78ae0620cc84cbfcd87d2e459843, type: 3}
   AudioManager: {fileID: 0}
   currentBall: {fileID: 0}
+  player1Controller: {fileID: 0}
+  player2Controller: {fileID: 0}
   player1Spawn: {fileID: 0}
   player2Spawn: {fileID: 0}
   powerUpPrefab: {fileID: 7644127951475467454, guid: 3d9b87fad584d47a98144e26bcaa301e,
@@ -67,7 +65,7 @@ MonoBehaviour:
   mainCamera: {fileID: 0}
   cameraPosition1: {fileID: 0}
   cameraPosition2: {fileID: 0}
-  gameSettings: {fileID: 11400000, guid: 2d9249ab010ae443cb7d48bb7d305b04, type: 2}
+  gameSettings: {fileID: 11400000, guid: ad1041a907f906742bab2d35c8ce9aa1, type: 2}
   OnLevelStart:
     m_PersistentCalls:
       m_Calls: []

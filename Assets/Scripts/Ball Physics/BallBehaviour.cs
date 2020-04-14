@@ -99,8 +99,8 @@ public class BallBehaviour : MonoBehaviour
             //If ball doesn't make it over the net, score the opposition
             if (insideCourt && bounce < 2)
             {
-                if (zBallPosition > 0 && GameManager.Instance.player1Prefab.transform.position.z > 0 ||
-                    zBallPosition < 0 && GameManager.Instance.player1Prefab.transform.position.z < 0)
+                if (zBallPosition > 0 && GameManager.Instance.player1Controller.transform.position.z > 0 ||
+                    zBallPosition < 0 && GameManager.Instance.player2Controller.transform.position.z < 0)
                 {
                     ScoreOpposition();
                 }

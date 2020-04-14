@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a32733da5a713454c91ea5ab8e415cee, type: 3}
-  m_Name: Game_Settings
+  m_Name: GameSettings
   m_EditorClassIdentifier: 
   colorList:
   - colorName: Green
     playerColor: {fileID: 2100000, guid: 7150ea3b7670847f9b7fcfcb1e7c059a, type: 2}
-    groundColor: {fileID: 0}
-    textColour: {r: 0.038573146, g: 1, b: 0, a: 1}
+    groundColor: {fileID: 2100000, guid: 36a0d9f3dd07ac64c9166ab3f260a3b0, type: 2}
+    textColour: {r: 0.006182432, g: 1, b: 0, a: 1}
     team: 0
   - colorName: Blue
     playerColor: {fileID: 2100000, guid: 840c058e6113e4078b35f9c8d1d91bb8, type: 2}
-    groundColor: {fileID: 0}
-    textColour: {r: 0, g: 0.25349808, b: 1, a: 1}
+    groundColor: {fileID: 2100000, guid: e82b28bc8cf8df74aad2573f6f14a0e8, type: 2}
+    textColour: {r: 0, g: 0.08817577, b: 1, a: 1}
     team: 1
   scoreValues:
   - 0
@@ -33,3 +33,4 @@ MonoBehaviour:
   powerupSpeedMultiplier: 1.5
   maxBallVelocity: 100
   ballSpawnDistance: 3
+  aiBoundXLimit: 13.5

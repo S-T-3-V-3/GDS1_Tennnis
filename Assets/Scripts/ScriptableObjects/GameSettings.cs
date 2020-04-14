@@ -14,7 +14,10 @@ public class GameSettings : ScriptableObject
     public float baseHitPower = 5f;
     public float powerupSpeedMultiplier = 1.5f;
     public float maxBallVelocity = 100f;
-    public float ballSpawnDistance = 5f;
+    public float ballSpawnDistance = 3f;
+
+    [Header("AI Settings")]
+    public float aiBoundXLimit = 13.5f;
 }
 
 [System.Serializable]

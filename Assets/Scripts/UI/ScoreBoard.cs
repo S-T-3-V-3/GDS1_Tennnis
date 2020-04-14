@@ -7,13 +7,7 @@ public class ScoreBoard : MonoBehaviour
     public TextMeshProUGUI ScoreStatusText;
     public TextMeshProUGUI TeamText;
     public TextMeshProUGUI SetScoresText;
-
-    GameManager gameManager;
-
-    public void Start()
-    {
-        gameManager = GameManager.Instance;
-    }
+    public GameManager gameManager;
 
     public void OnScoreUpdate(Score score)
     {

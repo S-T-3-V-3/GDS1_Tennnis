@@ -2,39 +2,32 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AIController : MonoBehaviour
-{
-    public GameObject playerModel;
-
-    public float boundXLimit;
-    public float maxZBound;
-    public float movementSpeed;
-
+public class PlayerAIState : State
+{   
+    PlayerController playerController;
     MeshRenderer meshRenderer;
-    private float futureScalar = 0.7f;
-    private Vector3 futurePosition;
-    public Team currentTeam;
-
     GameManager gameManager;
-    bool hasSetFuture = false;
+    GameObject playerModel;
     Rigidbody currentBallRB;
+    Vector3 futurePosition;
+    Team currentTeam;
 
-    // Start is called before the first frame update
-    void Awake()
+    bool hasSetFuture = false;
+    float maxZBound;
+    float boundXLimit;
+    float futureScalar = 0.7f;
+
+    public override void BeginState()
     {
+        playerController = this.gameObject.GetComponent<PlayerController>();
+
+        currentTeam = playerController.currentTeam;
+        playerModel = playerController.playerModel;
         meshRenderer = playerModel.GetComponent<MeshRenderer>();
         gameManager = GameManager.Instance;
-    }
 
-    void Start()
-    {
         maxZBound = transform.position.z + 0.5f;
-    }
-
-    void GetBallRef() {
-        if (gameManager.currentBall == null) return;
-
-        currentBallRB = gameManager.currentBall.GetComponent<Rigidbody>();
+        boundXLimit = gameManager.gameSettings.aiBoundXLimit;
     }
 
     void FixedUpdate()
@@ -50,9 +43,10 @@ public class AIController : MonoBehaviour
             ReturnToCenter();
     }
 
-    public void SetColor(PlayerColors color)
-    {
-        meshRenderer.material = color.playerColor;
+    void GetBallRef() {
+        if (gameManager.currentBall == null) return;
+
+        currentBallRB = gameManager.currentBall.GetComponent<Rigidbody>();
     }
 
     void MoveToBall()
@@ -65,21 +59,11 @@ public class AIController : MonoBehaviour
         }
     }
 
-    //Remove until Final
-    private void PongMovement()
-    {
-        Vector3 ballPos = currentBallRB.transform.localPosition;
-        Vector3 ballPosX = new Vector3(ballPos.x, 0, 0);
-        Vector3 AIPosX = new Vector3(transform.position.x, 0, 0);
-        transform.position = new Vector3(ballPos.x * movementSpeed * 0.5f, transform.position.y, transform.position.z);
-    }
-
-    private void FindFuturePosition()
+    void FindFuturePosition()
     {
         futurePosition = currentBallRB.transform.position + currentBallRB.velocity * futureScalar;
         futurePosition.y = transform.position.y;
         hasSetFuture = true;
-        //transform.position = Vector3.Lerp(transform.position, futurePosition, 0.1f);
     }
 
     void ReturnToCenter()
@@ -88,5 +72,14 @@ public class AIController : MonoBehaviour
         {
             transform.position = Vector3.Lerp(transform.position, new Vector3(0,transform.position.y, transform.position.z), 0.05f);
         }
+    }
+
+    //Remove until Final
+    private void PongMovement()
+    {
+        Vector3 ballPos = currentBallRB.transform.localPosition;
+        Vector3 ballPosX = new Vector3(ballPos.x, 0, 0);
+        Vector3 AIPosX = new Vector3(transform.position.x, 0, 0);
+        transform.position = new Vector3(ballPos.x * playerController.baseSpeed * 0.5f, transform.position.y, transform.position.z);
     }
 }

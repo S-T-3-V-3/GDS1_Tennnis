@@ -11,7 +11,7 @@ public class Score {
 
     public string scoreStatusText;
 
-    public Team currentServer;
+    public Team currentServer = Team.BLUE;
 
     public ScoreEvent OnScoreUpdated;
     public UnityEvent OnSetCompleted;
