@@ -17,10 +17,10 @@ public class ScoreBoard : MonoBehaviour
 
     public void OnScoreUpdate(Score score)
     {
-        string redScore = gameManager.gameSettings.scoreValues[Mathf.Clamp(score.redGameScore,0,3)];
+        string greenScore = gameManager.gameSettings.scoreValues[Mathf.Clamp(score.greenGameScore,0,3)];
         string blueScore = gameManager.gameSettings.scoreValues[Mathf.Clamp(score.blueGameScore,0,3)];
-        GameScoreText.text = $"<color=red>{redScore}</color> - <color=blue>{blueScore}</color>";
-        SetScoresText.text = $"{score.redSetScore}\n{score.blueSetScore}";
+        GameScoreText.text = $"<color=green>{greenScore}</color> - <color=blue>{blueScore}</color>";
+        SetScoresText.text = $"{score.greenSetScore}\n{score.blueSetScore}";
         ScoreStatusText.text = score.scoreStatusText;
     }
 }

@@ -4,66 +4,52 @@ using UnityEngine.Events;
 
 public class GameManager : MonoBehaviour
 {
-
     public static GameManager Instance = null;
 
     public SessionData sessionData;
+    public GamePlay currentPlaymode = GamePlay.SinglePlayer;
+
+    [Header("Prefabs")]
+    public GameObject player1Prefab;
+    public GameObject player2Prefab;
+    public GameObject AiPlayerPrefab;
+    public GameObject ballPrefab;
 
     [Header("Scene Components")]
     public HUDManager hud;
 
-    [Space]
-    public GamePlay currentPlaymode = GamePlay.SinglePlayer;
+    [HideInInspector]
+    public GameObject currentBall;  
 
-    //Test temporary variables
-    [HideInInspector] public int scoreP1;
-    [HideInInspector] public int setWinsP1;
-
-    [HideInInspector] public int scoreP2;
-    [HideInInspector] public int setWinsP2;
-
-    public GameObject ballPrefab; //Replace with real ball
-
-    PlayerColors color1;
-    PlayerColors color2;
-
-    //Additional Temporary Variables
-    //Make Sure to insert these variables
     [Header("Respawn")]
     public Transform player1Spawn;
     public Transform player2Spawn;
-    public Transform ballSpawnPos;
 
     [Header("Powerup Variables")]
     //[Tooltip("This sets the spawn bound area for powerups on each respective side")]
     public GameObject powerUpPrefab;
     public Vector3 courtCenter1;
     public Vector3 courtCenter2;
-    //public Vector3 boundSize;
 
     [Header("Camera")]
     public Camera mainCamera;
-
-    [Header("Camera Positions")]
     public Transform cameraPosition1;
     public Transform cameraPosition2;
 
-    [Header("Playable Prefabs")]
-    public GameObject player1Prefab;
-    public GameObject player2Prefab;
-    public GameObject AiPlayerPrefab;
-
-    [Header("Game Settings")]
+    [Header("Settings")]
     public GameSettings gameSettings;
 
-    [Header("Game Events")]
+    [Header("Events")]
     public UnityEvent OnLevelStart;
     public TeamEvent OnPlayerScore;
+    public UnityEvent OnRoundComplete;
     public UnityEvent OnSetComplete;
     public UnityEvent OnGameComplete;
 
     public List<PlayerColors> playerColors;
 
+    PlayerColors color1;
+    PlayerColors color2;
     GameObject player1;
     GameObject player2;
 
@@ -90,58 +76,45 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        if (currentPlaymode == GamePlay.SinglePlayer)
-            SinglePlayerSpawn();
-        else
-            TwoPlayerSpawn();
-
-        OnSetComplete.AddListener(ResetNextMatch);
+        OnRoundComplete.AddListener(StartNewRound);
+        OnSetComplete.AddListener(StartNewMatch);
         OnSetComplete.AddListener(TriggerPowerupSpawner);
+
+        Spawn(currentPlaymode == GamePlay.SinglePlayer ? false : true);
+        StartNewMatch();
     }
 
-    private void SinglePlayerSpawn()
-    {
+    void SpawnBall(Vector3 pos) {
+        if (currentBall != null)
+            GameObject.Destroy(currentBall);
+
+        currentBall = GameObject.Instantiate(ballPrefab);
+        currentBall.transform.position = pos;
+    }
+
+    void Spawn(bool twoPlayer = false) {
         color1 = SelectColor();
         color2 = SelectColor();
-        GameObject ballInstance = Instantiate(ballPrefab) as GameObject;
 
-        player1 = Instantiate(player1Prefab, player1Spawn.position, player1Spawn.rotation) as GameObject;
+        player1 = GameObject.Instantiate(player1Prefab, player1Spawn.position, player1Spawn.rotation);
         player1Controller = player1.GetComponent<PlayerController>();
         player1Controller.playerSelection = PlayerController.PlayerSelection.Player1;
         player1Controller.SetColor(color1);
-        player1Controller.ballTarget = ballInstance;
         player1Controller.currentTeam = color1.team;
 
-        player2 = Instantiate(AiPlayerPrefab, player2Spawn.position, player2Spawn.rotation) as GameObject;
-        AIController player2Controller = player2.GetComponent<AIController>();
-        player2Controller.SetColor(color2);
-        player2Controller.ballTarget = ballInstance;
-        player2Controller.currentTeam = color2.team;
-
-        sessionData.isStarted = true;
-    }
-
-    private void TwoPlayerSpawn()
-    {
-        color1 = SelectColor();
-        color2 = SelectColor();
-        GameObject ballInstance = Instantiate(ballPrefab) as GameObject;
-
-        player1 = Instantiate(player1Prefab, player1Spawn.position, player1Spawn.rotation) as GameObject;
-        player1Controller = player1.GetComponent<PlayerController>();
-        player1Controller.playerSelection = PlayerController.PlayerSelection.Player1;
-        player1Controller.SetColor(color1);
-        player1Controller.ballTarget = ballInstance;
-        player1Controller.currentTeam = color1.team;
-
-        player2 = Instantiate(player2Prefab, player2Spawn.position, player2Spawn.rotation) as GameObject;
-        player2Controller = player2.GetComponent<PlayerController>();
-        player2Controller.playerSelection = PlayerController.PlayerSelection.Player2;
-        player2Controller.SetColor(color2);
-        player2Controller.ballTarget = ballInstance;
-        player2Controller.currentTeam = color2.team;
-
-        sessionData.isStarted = true;
+        if (twoPlayer) {
+            player2 = GameObject.Instantiate(player2Prefab, player2Spawn.position, player2Spawn.rotation);
+            player2Controller = player2.GetComponent<PlayerController>();
+            player2Controller.playerSelection = PlayerController.PlayerSelection.Player2;
+            player2Controller.SetColor(color2);
+            player2Controller.currentTeam = color2.team;
+        }
+        else {
+            player2 = GameObject.Instantiate(AiPlayerPrefab, player2Spawn.position, player2Spawn.rotation);
+            AIController player2Controller = player2.GetComponent<AIController>();
+            player2Controller.SetColor(color2);
+            player2Controller.currentTeam = color2.team;
+        }
     }
 
     private PlayerColors SelectColor()
@@ -156,7 +129,6 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         ChangeCameraPositions();
-
         TestSpawnPowerup();
     }
 
@@ -182,7 +154,7 @@ public class GameManager : MonoBehaviour
 
     void SpawnPowerup() //Spawns once
     {
-        Team loosingTeam = sessionData.GetLoosingTeam();
+        Team loosingTeam = sessionData.GetLosingTeam();
 
         if (currentPlaymode == GamePlay.SinglePlayer)
         {
@@ -218,7 +190,7 @@ public class GameManager : MonoBehaviour
     #endregion
 
     //Resets Scene for next match
-    public void ResetNextMatch()
+    public void StartNewMatch()
     {
         player1.transform.position = player1Spawn.position;
         player1.transform.rotation = player1Spawn.rotation;
@@ -232,9 +204,6 @@ public class GameManager : MonoBehaviour
             mainCamera.transform.rotation = cameraPosition2.rotation;
 
             camViewInPos2 = true;
-
-            InvertSingleController();
-            InvertingDoubleController();
         }
         else
         {
@@ -242,27 +211,18 @@ public class GameManager : MonoBehaviour
             mainCamera.transform.rotation = cameraPosition1.rotation;
 
             camViewInPos2 = false;
-
-            InvertSingleController();
-            InvertingDoubleController();
         }
+
+        sessionData.StartGame();
+        StartNewRound();
     }
 
-    private void InvertSingleController()
-    {
-        if (currentPlaymode == GamePlay.SinglePlayer)
-        {
-            player1Controller.controlModifier *= -1;
-        }
-    }
+    void StartNewRound() {
+        Team currentServer = sessionData.GetCurrentServer();
+        Transform currentServerTransform = player1Controller.currentTeam == currentServer ? player1.transform : player2.transform;
 
-    private void InvertingDoubleController()
-    {
-        if (currentPlaymode == GamePlay.DoublePlayer)
-        {
-            player1Controller.controlModifier *= -1;
-            player2Controller.controlModifier *= -1;
-        }
+        Vector3 ballSpawnPos = currentServerTransform.position + currentServerTransform.forward * gameSettings.ballSpawnDistance + new Vector3(0,1,0);
+        SpawnBall(ballSpawnPos);
     }
 
     //Test Methods
@@ -273,17 +233,12 @@ public class GameManager : MonoBehaviour
             mainCamera.transform.position = cameraPosition1.position;
             mainCamera.transform.rotation = cameraPosition1.rotation;
 
-            InvertSingleController();
-            InvertingDoubleController();
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             mainCamera.transform.position = cameraPosition2.position;
             mainCamera.transform.rotation = cameraPosition2.rotation;
-
-            InvertSingleController();
-            InvertingDoubleController();
         }
     }
 

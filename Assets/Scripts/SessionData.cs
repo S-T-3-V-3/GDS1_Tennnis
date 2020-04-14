@@ -9,31 +9,35 @@ public class SessionData : MonoBehaviour
     ScoreBoard scoreBoard;
     Score score;
 
-    public void Start()
+    void Awake()
     {
         gameManager = GameManager.Instance;
         gameManager.OnPlayerScore.AddListener(OnPlayerScore);
         scoreBoard = gameManager.hud.scoreBoard;
+    }
 
-        score = new Score();
+    public void StartGame() {
+        if (score == null)
+            score = new Score();
+        
         Reset();
+        isStarted = true;
+        score.NewSet();
     }
 
     public void OnPlayerScore(Team team)
     {
+        gameManager.OnRoundComplete.Invoke();
         score.AddScore(team);
     }
 
-    public Team GetLoosingTeam()
+    public Team GetLosingTeam()
     {
-        if(score.redGameScore > score.blueGameScore)
-        {
-            return Team.RED;
-        }
-        else
-        {
-            return Team.BLUE;
-        }
+        return score.greenGameScore > score.blueGameScore ? Team.GREEN : Team.BLUE;
+    }
+
+    public Team GetCurrentServer() {
+        return score.currentServer;
     }
 
     void Reset()

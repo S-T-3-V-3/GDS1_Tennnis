@@ -13,15 +13,15 @@ MonoBehaviour:
   m_Name: Game_Settings
   m_EditorClassIdentifier: 
   colorList:
-  - colorName: Red
+  - colorName: Green
     playerColor: {fileID: 2100000, guid: 7150ea3b7670847f9b7fcfcb1e7c059a, type: 2}
     groundColor: {fileID: 0}
-    textColour: {r: 0, g: 0, b: 0, a: 0}
+    textColour: {r: 0.038573146, g: 1, b: 0, a: 1}
     team: 0
   - colorName: Blue
     playerColor: {fileID: 2100000, guid: 840c058e6113e4078b35f9c8d1d91bb8, type: 2}
     groundColor: {fileID: 0}
-    textColour: {r: 0, g: 0, b: 0, a: 0}
+    textColour: {r: 0, g: 0.25349808, b: 1, a: 1}
     team: 1
   scoreValues:
   - 0
@@ -32,3 +32,4 @@ MonoBehaviour:
   baseHitPower: 5
   powerupSpeedMultiplier: 1.5
   maxBallVelocity: 100
+  ballSpawnDistance: 5

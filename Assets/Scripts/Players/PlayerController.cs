@@ -11,18 +11,20 @@ public class PlayerController : MonoBehaviour
     }
 
     public GameObject playerModel;
-    public GameObject ballTarget;
     public PlayerSelection playerSelection;
     public Team currentTeam;
     public float baseSpeed = 3f;
-    public float controlModifier = 1;
 
     MeshRenderer playerRenderer;
+    GameManager gameManager;
+    CameraController mainCamera;
 
     // Start is called before the first frame update
     void Awake()
     {
         playerRenderer = playerModel.GetComponent<MeshRenderer>();
+        gameManager = GameManager.Instance;
+        mainCamera = gameManager.mainCamera.GetComponent<CameraController>();
     }
 
     void FixedUpdate()
@@ -57,24 +59,20 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            float movementX = baseSpeed * -1;
-            transform.position += transform.right * movementX * Time.fixedDeltaTime;
+            transform.position += mainCamera.rightVector * baseSpeed * Time.fixedDeltaTime * -1;
         }
         else if (Input.GetKey(KeyCode.RightArrow))
         {
-            float movementX = baseSpeed * 1;
-            transform.position += transform.right * movementX * Time.fixedDeltaTime;
+            transform.position += mainCamera.rightVector * baseSpeed * Time.fixedDeltaTime;
         }
 
         if (Input.GetKey(KeyCode.UpArrow))
         {
-            float movementY = baseSpeed * 1;
-            transform.position += transform.forward * movementY * Time.fixedDeltaTime;
+            transform.position += mainCamera.forwardVector * baseSpeed * Time.fixedDeltaTime;
         }
         else if (Input.GetKey(KeyCode.DownArrow))
         {
-            float movementY = baseSpeed * -1;
-            transform.position += transform.forward * movementY * Time.fixedDeltaTime;
+            transform.position += mainCamera.forwardVector * baseSpeed * Time.fixedDeltaTime * -1;
         }
     }
 
@@ -84,38 +82,29 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.A))
         {
-            float movementX = baseSpeed * -1 * controlModifier;
-            transform.position += transform.right * movementX * Time.fixedDeltaTime;
+            transform.position += mainCamera.rightVector * baseSpeed * Time.fixedDeltaTime * -1;
         }
         else if (Input.GetKey(KeyCode.D))
         {
-            float movementX = baseSpeed * 1 * controlModifier;
-            transform.position += transform.right * movementX * Time.fixedDeltaTime;
+            transform.position += mainCamera.rightVector * baseSpeed * Time.fixedDeltaTime;
         }
 
         if (Input.GetKey(KeyCode.W))
         {
-            float movementY = baseSpeed * 1 * controlModifier;
-            transform.position += transform.forward * movementY * Time.fixedDeltaTime;
+            transform.position += mainCamera.forwardVector * baseSpeed * Time.fixedDeltaTime;
         }
         else if (Input.GetKey(KeyCode.S))
         {
-            float movementY = baseSpeed * -1 * controlModifier;
-            transform.position += transform.forward * movementY * Time.fixedDeltaTime;
+            transform.position += mainCamera.forwardVector * baseSpeed * Time.fixedDeltaTime * -1;
         }
     }
 
     void LookAtBall()
     {
-        if(ballTarget != null)
-        {
-            /*Vector3 direction = ballTarget.transform.position - playerModel.transform.position;
-            Quaternion lookRot = Quaternion.LookRotation(direction) * Quaternion.AngleAxis(90, Vector3.up);
-            playerModel.transform.localRotation = lookRot;*/
+        if (gameManager.currentBall == null) return;
 
-            Vector3 difference = ballTarget.transform.position - playerModel.transform.position;
-            float rotationY = Mathf.Atan2(difference.x, difference.z) * Mathf.Rad2Deg;
-            playerModel.transform.localRotation = Quaternion.Euler(0, rotationY, 0);
-        }
+        Vector3 difference = gameManager.currentBall.transform.position - playerModel.transform.position;
+        float rotationY = Mathf.Atan2(difference.x, difference.z) * Mathf.Rad2Deg;
+        playerModel.transform.localRotation = Quaternion.Euler(0, rotationY, 0);
     }
 }

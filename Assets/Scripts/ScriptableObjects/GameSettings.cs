@@ -14,6 +14,7 @@ public class GameSettings : ScriptableObject
     public float baseHitPower = 5f;
     public float powerupSpeedMultiplier = 1.5f;
     public float maxBallVelocity = 100f;
+    public float ballSpawnDistance = 5f;
 }
 
 [System.Serializable]
@@ -27,6 +28,6 @@ public struct PlayerColors
 }
 
 public enum Team {
-    RED,
+    GREEN,
     BLUE
 }

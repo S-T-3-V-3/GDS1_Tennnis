@@ -6,9 +6,6 @@ public class AIController : MonoBehaviour
 {
     public GameObject playerModel;
 
-    public GameObject ballTarget;
-    Rigidbody ballRB;
-
     public float boundXLimit;
     public float maxZBound;
     public float movementSpeed;
@@ -18,12 +15,15 @@ public class AIController : MonoBehaviour
     private Vector3 futurePosition;
     public Team currentTeam;
 
+    GameManager gameManager;
     bool hasSetFuture = false;
+    Rigidbody currentBallRB;
 
     // Start is called before the first frame update
     void Awake()
     {
         meshRenderer = playerModel.GetComponent<MeshRenderer>();
+        gameManager = GameManager.Instance;
     }
 
     void Start()
@@ -31,17 +31,22 @@ public class AIController : MonoBehaviour
         maxZBound = transform.position.z + 0.5f;
     }
 
-    // Update is called once per frame
+    void GetBallRef() {
+        if (gameManager.currentBall == null) return;
+
+        currentBallRB = gameManager.currentBall.GetComponent<Rigidbody>();
+    }
+
     void FixedUpdate()
     {
-        if (ballRB == null) ballRB = ballTarget.GetComponent<Rigidbody>();
+        if (currentBallRB == null) {
+            GetBallRef();
+            return;
+        }
 
-        //Vector3 ballDirection = transform.position - ballTarget.transform.position;
-        //ballDirection = ballDirection.normalized;
-
-        if (ballRB.velocity.z > 0)
+        if (currentBallRB.velocity.z > 0)
             MoveToBall();
-        else if (ballRB.velocity.z < 0)
+        else if (currentBallRB.velocity.z < 0)
             ReturnToCenter();
     }
 
@@ -63,7 +68,7 @@ public class AIController : MonoBehaviour
     //Remove until Final
     private void PongMovement()
     {
-        Vector3 ballPos = ballTarget.transform.localPosition;
+        Vector3 ballPos = currentBallRB.transform.localPosition;
         Vector3 ballPosX = new Vector3(ballPos.x, 0, 0);
         Vector3 AIPosX = new Vector3(transform.position.x, 0, 0);
         transform.position = new Vector3(ballPos.x * movementSpeed * 0.5f, transform.position.y, transform.position.z);
@@ -71,7 +76,7 @@ public class AIController : MonoBehaviour
 
     private void FindFuturePosition()
     {
-        futurePosition = ballTarget.transform.position + ballRB.velocity * futureScalar;
+        futurePosition = currentBallRB.transform.position + currentBallRB.velocity * futureScalar;
         futurePosition.y = transform.position.y;
         hasSetFuture = true;
         //transform.position = Vector3.Lerp(transform.position, futurePosition, 0.1f);
@@ -84,17 +89,4 @@ public class AIController : MonoBehaviour
             transform.position = Vector3.Lerp(transform.position, new Vector3(0,transform.position.y, transform.position.z), 0.05f);
         }
     }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.GetComponent<Ball_Launch>() != null)
-        {
-            //hasHit = true;
-        }
-    }
-
-    /*private bool GroundCheck()
-    {
-        //return Physics.
-    }*/
 }

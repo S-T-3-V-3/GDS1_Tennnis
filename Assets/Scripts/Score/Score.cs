@@ -4,12 +4,14 @@
 public class ScoreEvent : UnityEvent<Score> {};
 
 public class Score {
-    public int redGameScore;
+    public int greenGameScore;
     public int blueGameScore;
-    public int redSetScore;
+    public int greenSetScore;
     public int blueSetScore;
 
     public string scoreStatusText;
+
+    public Team currentServer;
 
     public ScoreEvent OnScoreUpdated;
     public UnityEvent OnSetCompleted;
@@ -21,50 +23,59 @@ public class Score {
         OnSetCompleted = new UnityEvent();
         OnGameCompleted = new UnityEvent();
 
-        redGameScore = 0;
-        blueGameScore = 0;
-        redSetScore = 0;
+        greenSetScore = 0;
         blueSetScore = 0;
+        greenGameScore = 0;
+        blueGameScore = 0;
     }
 
     public void NewSet()
     {
-        redGameScore = 0;
+        greenGameScore = 0;
         blueGameScore = 0;
-        OnSetCompleted.Invoke();
+
+        currentServer = currentServer == Team.GREEN ? Team.BLUE : Team.GREEN;   
     }
 
     public void AddScore(Team team)
     {
-        if (team == Team.RED) {
-            if (redGameScore < 3 || redGameScore <= blueGameScore) {
-                redGameScore++;
+        if (team == Team.GREEN) {
+            if (greenGameScore < 3 || greenGameScore <= blueGameScore) {
+                greenGameScore++;
             }
-            else if (redGameScore > blueGameScore) {
-                redSetScore++;
-                if (redSetScore >= 6)
+            else if (greenGameScore > blueGameScore) {
+                greenSetScore++;
+
+                if (greenSetScore >= 6) {
                     OnGameCompleted.Invoke();
-                NewSet();
+                }
+                else {
+                    NewSet();
+                    OnSetCompleted.Invoke();
+                }
             }
         }
         else if (team == Team.BLUE) {
-            if (blueGameScore < 3 || blueGameScore <= redGameScore) {
+            if (blueGameScore < 3 || blueGameScore <= greenGameScore) {
                 blueGameScore++;
             }
-            else if (blueGameScore > redGameScore) {
+            else if (blueGameScore > greenGameScore) {
                 blueSetScore++;
+
                 if (blueSetScore >= 6)
                     OnGameCompleted.Invoke();
+
                 NewSet();
+                OnSetCompleted.Invoke();
             }
         }
 
-        if (redGameScore >= 3 && blueGameScore >= 3) {
-            if (redGameScore == blueGameScore)
+        if (greenGameScore >= 3 && blueGameScore >= 3) {
+            if (greenGameScore == blueGameScore)
                 scoreStatusText = "Deuce";
-            else if (redGameScore > blueGameScore)
+            else if (greenGameScore > blueGameScore)
                 scoreStatusText = "<color=green>Advantage</color>";
-            else if (blueGameScore > redGameScore)
+            else if (blueGameScore > greenGameScore)
                 scoreStatusText = "<color=blue>Advantage</color>";
         }
         else
