@@ -11,8 +11,7 @@ public class PlayerControlledState : State
     BallBehaviour ballBehaviour;
     CameraController mainCamera;
     PlayerSelection playerSelection;
-    
-    float xDirectionModifier;
+    PlayerController otherPlayer;
 
     bool forwardInput;
     bool backwardInput;
@@ -39,9 +38,8 @@ public class PlayerControlledState : State
     {
         if (gameManager.currentBall == null) return;
 
-        Vector3 difference = gameManager.currentBall.transform.position - playerModel.transform.position;
-        float rotationY = Mathf.Atan2(difference.x, difference.z) * Mathf.Rad2Deg;
-        playerModel.transform.localRotation = Quaternion.Euler(0, rotationY, 0);
+        playerModel.transform.LookAt(gameManager.currentBall.transform.position);
+        playerModel.transform.rotation = Quaternion.Euler(0,playerModel.transform.rotation.eulerAngles.y,0);
     }
 
     void GetInputs() {
@@ -84,16 +82,9 @@ public class PlayerControlledState : State
 
             ballBehaviour = collision.gameObject.GetComponent<BallBehaviour>();
 
-            if(transform.position.z < 0)
-            {
-                xDirectionModifier = playerModel.transform.localRotation.y;
-            }
-            else
-            {
-                xDirectionModifier = playerModel.transform.localRotation.y * 3.5f / 8.5f;
-            }
+            Vector3 dir = Vector3.Normalize(this.transform.position - gameManager.currentBall.transform.position);
 
-            ballBehaviour.ReturnBall(this.transform, xDirectionModifier, GetComponent<PlayerController>().currentTeam);
+            ballBehaviour.ReturnBall(dir, GetComponent<PlayerController>().currentTeam);
         }
     }
 }

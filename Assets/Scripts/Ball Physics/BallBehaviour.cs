@@ -30,7 +30,7 @@ public class BallBehaviour : MonoBehaviour
     }
 
     //Send the ball back to the other side. Detected in player hit collision
-    public void ReturnBall(Transform playerTransform, float xDirectionModifier, Team currentTeam)
+    public void ReturnBall(Vector3 dir, Team currentTeam)
     {
         if(!ballRigidbody.useGravity)
             ballRigidbody.useGravity = true;
@@ -38,27 +38,8 @@ public class BallBehaviour : MonoBehaviour
         ballRigidbody.velocity = Vector3.zero;
         ResetBounceCounter();
 
-        switch (playerTransform.position.z)
-        {
-            case float z when (z < -14):
-                ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y, ballForces.z * playerTransform.forward.z));
-                break;
-            case float z when (z >= -14 && z < -7):
-                ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y / 1.5f, ballForces.z * playerTransform.forward.z));
-                break;
-            case float z when (z >= -7 && z < 0):
-                ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y / 2, ballForces.z * playerTransform.forward.z));
-                break;
-            case float z when (z >= 0 && z < 7):
-                ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y / 2, -ballForces.z * playerTransform.forward.z));
-                break;
-            case float z when (z >= 7 && z < 14):
-                ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y / 1.5f, -ballForces.z * playerTransform.forward.z));
-                break;
-            case float z when (z >= 14):
-                ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y, -ballForces.z * playerTransform.forward.z));  
-                break;
-        }
+        ballRigidbody.AddForce(new Vector3(ballForces.x * dir.x * -1, ballForces.y, ballForces.z * dir.z * -1));
+
         lastHitter = currentTeam;
     }
 

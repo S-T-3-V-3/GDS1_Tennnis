@@ -123,7 +123,7 @@ public class GameManager : MonoBehaviour
 
     private PlayerColors SelectColor()
     {
-        int selectionindex = UnityEngine.Random.Range(0, playerColors.Count);
+        int selectionindex = 0;
         PlayerColors selectedColor = playerColors[selectionindex];
         playerColors.RemoveAt(selectionindex);
         return selectedColor;

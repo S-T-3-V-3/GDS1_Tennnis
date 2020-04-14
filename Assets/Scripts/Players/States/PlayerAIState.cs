@@ -8,14 +8,18 @@ public class PlayerAIState : State
     MeshRenderer meshRenderer;
     GameManager gameManager;
     GameObject playerModel;
+    BallBehaviour ballBehaviour;
     Rigidbody currentBallRB;
     Vector3 futurePosition;
     Team currentTeam;
+    PlayerController otherPlayer;
 
+    bool hasArrivedFuture = false;
     bool hasSetFuture = false;
     float maxZBound;
     float boundXLimit;
-    float futureScalar = 0.7f;
+    float futureScalar = 2f;
+    float xDirectionModifier;
 
     public override void BeginState()
     {
@@ -28,6 +32,10 @@ public class PlayerAIState : State
 
         maxZBound = transform.position.z + 0.5f;
         boundXLimit = gameManager.gameSettings.aiBoundXLimit;
+
+        gameManager.OnRoundComplete.AddListener(() => {
+            hasSetFuture = false;
+        });
     }
 
     void FixedUpdate()
@@ -37,10 +45,28 @@ public class PlayerAIState : State
             return;
         }
 
+        LookAtBall();
+
         if (currentBallRB.velocity.z > 0)
             MoveToBall();
         else if (currentBallRB.velocity.z < 0)
             ReturnToCenter();
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.GetComponent<BallBehaviour>() == null) return;
+        {
+            GameManager.Instance.AudioManager.GetComponent<AudioManager>().PlaySound("Hit");
+
+            ballBehaviour = collision.gameObject.GetComponent<BallBehaviour>();
+
+            Vector3 dir = Vector3.Normalize(this.transform.position - gameManager.currentBall.transform.position);
+
+            ballBehaviour.ReturnBall(dir, GetComponent<PlayerController>().currentTeam);
+
+            hasSetFuture = false;
+        }
     }
 
     void GetBallRef() {
@@ -49,13 +75,28 @@ public class PlayerAIState : State
         currentBallRB = gameManager.currentBall.GetComponent<Rigidbody>();
     }
 
+    void LookAtBall()
+    {
+        if (gameManager.currentBall == null) return;
+
+        playerModel.transform.LookAt(gameManager.currentBall.transform.position);
+        playerModel.transform.rotation = Quaternion.Euler(0,playerModel.transform.rotation.eulerAngles.y,0);
+    }
+
     void MoveToBall()
     {
-        if(transform.position.x < boundXLimit && transform.position.x > -boundXLimit && transform.position.z < maxZBound)
+        if (!hasArrivedFuture)
         {
-            if (!hasSetFuture) FindFuturePosition();
+            if (hasSetFuture == false)
+                FindFuturePosition();
+
             futurePosition.y = transform.position.y;
             transform.position = Vector3.Lerp(transform.position, futurePosition, 0.1f);
+
+            if (transform.position == futurePosition)
+            {
+                hasArrivedFuture = true;
+            }
         }
     }
 

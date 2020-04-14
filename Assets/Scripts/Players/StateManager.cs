@@ -18,7 +18,6 @@ public class StateManager : MonoBehaviour
             this.RemoveState();
         
         currentState = this.gameObject.AddComponent<T>();
-
         currentState.BeginState();
     }
 
