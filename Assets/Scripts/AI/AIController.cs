@@ -6,18 +6,25 @@ public class AIController : MonoBehaviour
 {
     public GameObject playerModel;
 
+    public bool isServing = false;
     public float boundXLimit;
+    public float boundZLimit;
     public float maxZBound;
     public float movementSpeed;
 
     MeshRenderer meshRenderer;
-    private float futureScalar = 0.7f;
+    private float futureScalar = 0.8f;
     private Vector3 futurePosition;
     public Team currentTeam;
 
-    GameManager gameManager;
-    bool hasSetFuture = false;
-    Rigidbody currentBallRB;
+    public GameManager gameManager;
+    public bool hasSetFuture = false;
+    public bool hasArrivedFuture = false;
+
+    public Rigidbody currentBallRB;
+
+    private BallBehaviour ballBehaviour;
+    private float xDirectionModifier;
 
     // Start is called before the first frame update
     void Awake()
@@ -44,6 +51,8 @@ public class AIController : MonoBehaviour
             return;
         }
 
+        ServeBall();
+
         if (currentBallRB.velocity.z > 0)
             MoveToBall();
         else if (currentBallRB.velocity.z < 0)
@@ -55,13 +64,32 @@ public class AIController : MonoBehaviour
         meshRenderer.material = color.playerColor;
     }
 
+    void ServeBall()
+    {
+        if (isServing)
+        {
+            FindFuturePosition();
+            futurePosition.y = transform.position.y;
+            transform.position = Vector3.Lerp(transform.position, futurePosition, 0.1f);
+        }
+    }
+
     void MoveToBall()
     {
         if(transform.position.x < boundXLimit && transform.position.x > -boundXLimit && transform.position.z < maxZBound)
         {
-            if (!hasSetFuture) FindFuturePosition();
-            futurePosition.y = transform.position.y;
-            transform.position = Vector3.Lerp(transform.position, futurePosition, 0.1f);
+            if (!hasArrivedFuture)
+            {
+                FindFuturePosition();
+                futurePosition.y = transform.position.y;
+                transform.position = Vector3.Lerp(transform.position, futurePosition, 0.1f);
+
+                if (transform.position == futurePosition)
+                {
+                    hasArrivedFuture = true;
+                }
+            }
+            
         }
     }
 
@@ -79,7 +107,6 @@ public class AIController : MonoBehaviour
         futurePosition = currentBallRB.transform.position + currentBallRB.velocity * futureScalar;
         futurePosition.y = transform.position.y;
         hasSetFuture = true;
-        //transform.position = Vector3.Lerp(transform.position, futurePosition, 0.1f);
     }
 
     void ReturnToCenter()
@@ -87,6 +114,33 @@ public class AIController : MonoBehaviour
         if(transform.position.x != 0)
         {
             transform.position = Vector3.Lerp(transform.position, new Vector3(0,transform.position.y, transform.position.z), 0.05f);
+        }
+        else
+        {
+            hasArrivedFuture = false;
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.GetComponent<BallBehaviour>() == null) return;
+        {
+            GameManager.Instance.AudioManager.GetComponent<AudioManager>().PlaySound("Hit");
+
+            ballBehaviour = collision.gameObject.GetComponent<BallBehaviour>();
+
+            if (transform.position.z > 0)
+            {
+                xDirectionModifier = playerModel.transform.rotation.y;
+            }
+            else
+            {
+                xDirectionModifier = playerModel.transform.rotation.y * 3.5f / 8.5f;
+                Debug.Log("Reverse Hit");
+            }
+
+            isServing = false;
+            ballBehaviour.ReturnBall(this.transform, 0, currentTeam);
         }
     }
 }

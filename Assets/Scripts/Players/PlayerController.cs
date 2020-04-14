@@ -19,9 +19,12 @@ public class PlayerController : MonoBehaviour
     GameManager gameManager;
     CameraController mainCamera;
 
+    public Rigidbody rigidBody;
+
     // Start is called before the first frame update
     void Awake()
     {
+        rigidBody = GetComponent<Rigidbody>();
         playerRenderer = playerModel.GetComponent<MeshRenderer>();
         gameManager = GameManager.Instance;
         mainCamera = gameManager.mainCamera.GetComponent<CameraController>();
@@ -57,46 +60,66 @@ public class PlayerController : MonoBehaviour
     //Key Movement
     void KeyMovement()
     {
+        Vector3 force = Vector3.zero;
+
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            transform.position += mainCamera.rightVector * baseSpeed * Time.fixedDeltaTime * -1;
+            //transform.position += mainCamera.rightVector * baseSpeed * Time.fixedDeltaTime * -1;
+            force += transform.right * baseSpeed * Time.fixedDeltaTime * -1;
         }
         else if (Input.GetKey(KeyCode.RightArrow))
         {
-            transform.position += mainCamera.rightVector * baseSpeed * Time.fixedDeltaTime;
+            //transform.position += mainCamera.rightVector * baseSpeed * Time.fixedDeltaTime;
+            force += transform.right * baseSpeed * Time.fixedDeltaTime;
         }
 
         if (Input.GetKey(KeyCode.UpArrow))
         {
-            transform.position += mainCamera.forwardVector * baseSpeed * Time.fixedDeltaTime;
+            //transform.position += mainCamera.forwardVector * baseSpeed * Time.fixedDeltaTime;
+            force += mainCamera.forwardVector * baseSpeed * Time.fixedDeltaTime;
         }
         else if (Input.GetKey(KeyCode.DownArrow))
         {
-            transform.position += mainCamera.forwardVector * baseSpeed * Time.fixedDeltaTime * -1;
+            //transform.position += mainCamera.forwardVector * baseSpeed * Time.fixedDeltaTime * -1;
+            force += mainCamera.forwardVector * baseSpeed * Time.fixedDeltaTime * -1;
         }
+
+        force = Vector3.ClampMagnitude(force, baseSpeed);
+        rigidBody.velocity = force;
     }
 
 
     //WASD Movement
     void WASDMovenet()
     {
+        Vector3 force = Vector3.zero;
+
         if (Input.GetKey(KeyCode.A))
         {
-            transform.position += mainCamera.rightVector * baseSpeed * Time.fixedDeltaTime * -1;
+            //transform.position += mainCamera.rightVector * baseSpeed * Time.fixedDeltaTime * -1;
+            force += mainCamera.rightVector * baseSpeed * 0.5f * -1;
         }
         else if (Input.GetKey(KeyCode.D))
         {
-            transform.position += mainCamera.rightVector * baseSpeed * Time.fixedDeltaTime;
+            //transform.position += mainCamera.rightVector * baseSpeed * Time.fixedDeltaTime;
+            force += mainCamera.rightVector * baseSpeed * 0.5f;
         }
 
         if (Input.GetKey(KeyCode.W))
         {
-            transform.position += mainCamera.forwardVector * baseSpeed * Time.fixedDeltaTime;
+            //transform.position += mainCamera.forwardVector * baseSpeed * Time.fixedDeltaTime;
+            force += mainCamera.forwardVector * baseSpeed * 0.5f;
+            //force += new Vector3(0, 10, 0);
         }
         else if (Input.GetKey(KeyCode.S))
         {
-            transform.position += mainCamera.forwardVector * baseSpeed * Time.fixedDeltaTime * -1;
+            //transform.position += mainCamera.forwardVector * baseSpeed * Time.fixedDeltaTime * -1;
+            force += mainCamera.forwardVector * baseSpeed * 0.5f * -1;
         }
+
+        force = Vector3.ClampMagnitude(force, baseSpeed);
+        rigidBody.velocity = force;
+        Debug.Log(rigidBody.velocity);
     }
 
     void LookAtBall()

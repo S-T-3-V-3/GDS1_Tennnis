@@ -76,9 +76,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerModel: {fileID: 9214401476600585797}
-  ballTarget: {fileID: 0}
+  isServing: 0
   boundXLimit: 13.5
+  boundZLimit: 14
+  maxZBound: 14
   movementSpeed: 2
+  currentTeam: 0
+  gameManager: {fileID: 0}
+  hasSetFuture: 0
+  hasArrivedFuture: 0
+  currentBallRB: {fileID: 0}
 --- !u!1 &9214401476600585797
 GameObject:
   m_ObjectHideFlags: 0
