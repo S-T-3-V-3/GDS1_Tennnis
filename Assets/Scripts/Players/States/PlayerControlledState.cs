@@ -81,9 +81,7 @@ public class PlayerControlledState : State
             GameManager.Instance.AudioManager.GetComponent<AudioManager>().PlaySound("Hit");
 
             ballBehaviour = collision.gameObject.GetComponent<BallBehaviour>();
-
             Vector3 dir = Vector3.Normalize(this.transform.position - gameManager.currentBall.transform.position);
-
             ballBehaviour.ReturnBall(dir, GetComponent<PlayerController>().currentTeam);
         }
     }
