@@ -31,6 +31,9 @@ public class AudioManager : MonoBehaviour
             case "PowerShot":
                 audioSource.clip = audioClips[4];
                 break;
+            case "Charging":
+                audioSource.clip = audioClips[5];
+                break;
         }
         audioSource.Play();
     }

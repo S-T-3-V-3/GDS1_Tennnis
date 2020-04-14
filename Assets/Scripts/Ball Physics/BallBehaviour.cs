@@ -6,14 +6,17 @@ public class BallBehaviour : MonoBehaviour
 {
     private Rigidbody ballRigidbody;
 
-    //ballAngle Inspector Test Case: 400x, 400y, 800z
-    public Vector3 ballForces;
+    //Sets the standard forces for the ball
+    public Vector3 ballForces = new Vector3(400, 400, 800);
 
     //Bounce detects the number of ball bounces, used in s
     private float bounce = 0;
 
     //Stores the player number of the last ball hitter
     private Team lastHitter;
+
+    //Bool to check if the player has a power shot power up
+    private bool powerShotEnabled = false;
 
     public enum PlayerPosition
     {
@@ -40,6 +43,9 @@ public class BallBehaviour : MonoBehaviour
 
             ballRigidbody.velocity = Vector3.zero;
             ResetBounceCounter();
+
+            if (powerShotEnabled)
+                StartCoroutine(SmackDown(ballForces, playerTransform.position.z));
 
             //Changes the x, y and z angle forces based on the player's z position and xDirectionalModifier
             switch (playerTransform.position.z)
@@ -83,6 +89,32 @@ public class BallBehaviour : MonoBehaviour
             lastHitter = currentTeam;
         }
 
+    }
+
+    //Called by another class to activate the powershot
+    public void ActivatePowerShot()
+    {
+        powerShotEnabled = true;
+    }
+
+    //Used as a part of the power shot to smack the ball down
+    IEnumerator SmackDown(Vector3 originalBallForces, float zPosition)
+    {
+        ballForces = new Vector3(0, 300, 0);
+        ballRigidbody.AddForce(ballForces);
+        GameManager.Instance.AudioManager.GetComponent<AudioManager>().PlaySound("Charging");
+
+        yield return new WaitForSeconds(0.4f);
+
+        if (zPosition < 0)
+            ballForces = new Vector3(0, -900, 2500);
+        else
+            ballForces = new Vector3(0, -900, -2500);
+
+        ballRigidbody.AddForce(ballForces);
+        GameManager.Instance.AudioManager.GetComponent<AudioManager>().PlaySound("PowerShot");
+        powerShotEnabled = false;
+        ballForces = originalBallForces;
     }
 
     //Changes the x-force to ensure the ball wont get sent out of the court
