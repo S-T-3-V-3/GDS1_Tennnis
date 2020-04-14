@@ -14,7 +14,7 @@ public class BallBehaviour : MonoBehaviour
     private bool stillScoring = true;
 
     //Stores the player number of the last ball hitter
-    private Team lastHitter = Team.BLUE;
+    public PlayerController lastHitter;
 
     public enum PlayerPosition
     {
@@ -30,8 +30,13 @@ public class BallBehaviour : MonoBehaviour
     }
 
     //Send the ball back to the other side. Detected in player hit collision
-    public void ReturnBall(Vector3 dir, Team currentTeam)
+    public void ReturnBall(Vector3 dir, PlayerController player)
     {
+        if (lastHitter == player) {
+            ScoreOpposition();
+            return;
+        }
+
         if(!ballRigidbody.useGravity)
             ballRigidbody.useGravity = true;
 
@@ -40,7 +45,7 @@ public class BallBehaviour : MonoBehaviour
 
         ballRigidbody.AddForce(new Vector3(ballForces.x * dir.x * -1, ballForces.y, ballForces.z * dir.z * -1));
 
-        lastHitter = currentTeam;
+        lastHitter = player;
     }
 
     // Once a point is scored, inform game manager of point update
@@ -61,36 +66,30 @@ public class BallBehaviour : MonoBehaviour
             bounce = 0;
     }
 
-    public void UpdateHitter(Team newHitter)
+    public void UpdateHitter(PlayerController newHitter)
     {
         lastHitter = newHitter;
     }
 
     //Adds to bounce counter but also checks scoring criteria
-    public void AddBounceCounter(bool insideCourt, float zBallPosition)
+    public void AddBounceCounter(bool insideCourt, float zBallPosition, PlayerController owningPlayer)
     {
         if (stillScoring)
         {
             bounce++;
+
             //If the ball lands outside the court without bouncing first, give opposition to the hitter the point
-            if (!insideCourt && bounce < 2)
+            if (!insideCourt && bounce == 1)
                 ScoreOpposition();
-            
-
             //If ball doesn't make it over the net, score the opposition
-            if (insideCourt && bounce < 2)
+            else if (bounce == 1 && owningPlayer == lastHitter)
             {
-                if (zBallPosition > 0 && GameManager.Instance.player1Controller.transform.position.z > 0 ||
-                    zBallPosition < 0 && GameManager.Instance.player2Controller.transform.position.z < 0)
-                {
-                    ScoreOpposition();
-                }
+                ScoreOpposition();
             }
-
-            //If the ball bounces twice on a player's side, give point to opposition
-            if (bounce == 2)
+            //If the ball bounces twice, give point to last hitter
+            else if (bounce > 1)
             {
-                PointScored(lastHitter);
+                PointScored(lastHitter.currentTeam);
             }
         }
     }
@@ -98,6 +97,6 @@ public class BallBehaviour : MonoBehaviour
     //Changes the point scorer to the opposition
     private void ScoreOpposition()
     {
-        PointScored(lastHitter == Team.GREEN ? Team.BLUE : Team.GREEN);
+        PointScored(lastHitter.currentTeam == Team.GREEN ? Team.BLUE : Team.GREEN);
     }
 }

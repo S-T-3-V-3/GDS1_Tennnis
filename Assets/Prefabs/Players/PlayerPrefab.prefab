@@ -44,11 +44,11 @@ Rigidbody:
   serializedVersion: 2
   m_Mass: 1
   m_Drag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 1
-  m_Constraints: 122
+  m_Constraints: 112
   m_CollisionDetection: 2
 --- !u!65 &3634291819669930617
 BoxCollider:
@@ -80,7 +80,8 @@ MonoBehaviour:
   currentTeam: 0
   stateManager: {fileID: 0}
   mainCamera: {fileID: 0}
-  baseSpeed: 14
+  isServing: 0
+  baseSpeed: 10
 --- !u!1 &5602723553184796268
 GameObject:
   m_ObjectHideFlags: 0

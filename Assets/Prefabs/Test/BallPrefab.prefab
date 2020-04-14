@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3174491044165046220}
   - component: {fileID: 7793872722964305214}
   m_Layer: 9
-  m_Name: Kyles_Test_Ball
+  m_Name: BallPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -123,4 +123,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8aa9644695a31d4ca748224649964f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ballForces: {x: 400, y: 400, z: 800}
+  ballForces: {x: 400, y: 375, z: 1000}

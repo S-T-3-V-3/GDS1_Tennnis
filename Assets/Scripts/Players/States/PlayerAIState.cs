@@ -10,16 +10,23 @@ public class PlayerAIState : State
     GameObject playerModel;
     BallBehaviour ballBehaviour;
     Rigidbody currentBallRB;
-    Vector3 futurePosition;
+    BallBehaviour currentBall;
+    Rigidbody playerRB;
     Team currentTeam;
     PlayerController otherPlayer;
 
-    bool hasArrivedFuture = false;
-    bool hasSetFuture = false;
+    public bool hasArrivedTarget = false;
+    public bool hasTarget = false;
+    public bool seekingBall = false;
+    public bool hasServed = false;
     float maxZBound;
     float boundXLimit;
     float futureScalar = 2f;
     float xDirectionModifier;
+
+    [SerializeField]
+    Vector3 targetPos;
+    float spawnDelay = 0.75f;
 
     public override void BeginState()
     {
@@ -33,44 +40,58 @@ public class PlayerAIState : State
         maxZBound = transform.position.z + 0.5f;
         boundXLimit = gameManager.gameSettings.aiBoundXLimit;
 
-        gameManager.OnRoundComplete.AddListener(() => {
-            hasSetFuture = false;
+        gameManager.OnRoundBegin.AddListener(() => {
+            hasTarget = false;
+            seekingBall = false;
+            hasServed = false;
+            spawnDelay = 0.75f;
         });
+
+        playerRB = this.GetComponent<Rigidbody>();
     }
 
-    void FixedUpdate()
+void FixedUpdate()
     {
-        if (currentBallRB == null) {
+        if (spawnDelay > 0) {
+            spawnDelay -= Time.deltaTime;
+            return;
+        }
+
+        if (currentBallRB == null)
+        {
             GetBallRef();
             return;
         }
 
+        ServeBall();
         LookAtBall();
-
-        if (currentBallRB.velocity.z > 0)
-            MoveToBall();
-        else if (currentBallRB.velocity.z < 0)
-            ReturnToCenter();
+        MoveToTarget();
     }
 
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.GetComponent<BallBehaviour>() == null) return;
-        {
-            GameManager.Instance.AudioManager.GetComponent<AudioManager>().PlaySound("Hit");
 
-            ballBehaviour = collision.gameObject.GetComponent<BallBehaviour>();
-            Vector3 dir = Vector3.Normalize(this.transform.position - gameManager.currentBall.transform.position);
-            ballBehaviour.ReturnBall(dir, GetComponent<PlayerController>().currentTeam);
+        GameManager.Instance.AudioManager.GetComponent<AudioManager>().PlaySound("Hit");
 
-            hasSetFuture = false;
-        }
+        ballBehaviour = collision.gameObject.GetComponent<BallBehaviour>();
+        Vector3 dir = Vector3.Normalize(this.transform.position - gameManager.currentBall.transform.position);
+        ballBehaviour.ReturnBall(dir, this.playerController);
+
+        hasTarget = false;
+        Invoke("FindTargetPosition",1.5f);
+
+        if (playerController.isServing && hasServed == false)
+            hasServed = true;
+
+        this.playerRB.velocity = this.playerRB.velocity * 0.1f;
     }
 
     void GetBallRef() {
         if (gameManager.currentBall == null) return;
 
         currentBallRB = gameManager.currentBall.GetComponent<Rigidbody>();
+        currentBall = currentBallRB.GetComponent<BallBehaviour>();
     }
 
     void LookAtBall()
@@ -81,35 +102,62 @@ public class PlayerAIState : State
         playerModel.transform.rotation = Quaternion.Euler(0,playerModel.transform.rotation.eulerAngles.y,0);
     }
 
-    void MoveToBall()
+    void MoveToTarget()
     {
-        if (!hasArrivedFuture)
+        if (!hasArrivedTarget)
         {
-            if (hasSetFuture == false)
-                FindFuturePosition();
+            if (hasTarget == false)
+                FindTargetPosition();
 
-            futurePosition.y = transform.position.y;
-            transform.position = Vector3.Lerp(transform.position, futurePosition, 0.1f);
+            if (hasTarget == false)
+                return;
 
-            if (transform.position == futurePosition)
+            Vector3 dir = (targetPos - transform.position).normalized;
+            playerRB.MovePosition(this.transform.position + dir * playerController.baseSpeed * Time.fixedDeltaTime);
+
+            if ((transform.position - targetPos).magnitude < 0.3f)
             {
-                hasArrivedFuture = true;
+                hasArrivedTarget = true;
             }
+        }
+        else if (seekingBall == false) {
+            FindTargetPosition();
         }
     }
 
-    void FindFuturePosition()
+    void ServeBall()
     {
-        futurePosition = currentBallRB.transform.position + currentBallRB.velocity * futureScalar;
-        futurePosition.y = transform.position.y;
-        hasSetFuture = true;
+        if (playerController.isServing && hasServed == false)
+        {
+            targetPos = currentBallRB.transform.position;
+            targetPos.x += Random.Range(-1.5f,1.5f);
+            targetPos.y = transform.position.y;
+            hasTarget = true;
+            seekingBall = true;
+            hasArrivedTarget = false;
+        }
     }
 
-    void ReturnToCenter()
+    void FindTargetPosition()
     {
-        if(transform.position.x != 0)
-        {
-            transform.position = Vector3.Lerp(transform.position, new Vector3(0,transform.position.y, transform.position.z), 0.05f);
+        if (currentBall.lastHitter == null) return;
+        
+        hasArrivedTarget = false;
+        
+        if (seekingBall) {
+            seekingBall = false;
+            targetPos = new Vector3(0,transform.position.y, transform.position.z);
+            hasTarget = true;
+        }
+        else if (currentBall.lastHitter == this.playerController) {
+            hasTarget = false;
+            return;
+        }
+        else if (currentBallRB.velocity.magnitude > 1) {
+            targetPos = currentBallRB.transform.position + currentBallRB.velocity * futureScalar;
+            targetPos.y = transform.position.y;
+            hasTarget = true;
+            seekingBall = true;
         }
     }
 

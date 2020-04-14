@@ -12,6 +12,7 @@ public class PlayerControlledState : State
     CameraController mainCamera;
     PlayerSelection playerSelection;
     PlayerController otherPlayer;
+    Rigidbody playerRB;
 
     bool forwardInput;
     bool backwardInput;
@@ -24,7 +25,9 @@ public class PlayerControlledState : State
         playerController = this.gameObject.GetComponent<PlayerController>();
         playerSelection = playerController.playerSelection;
         playerModel = playerController.playerModel;
-        mainCamera = playerController.mainCamera;        
+        mainCamera = playerController.mainCamera;
+
+        playerRB = this.GetComponent<Rigidbody>();
     }
 
     void FixedUpdate()
@@ -55,23 +58,37 @@ public class PlayerControlledState : State
             leftInput = Input.GetKey(KeyCode.LeftArrow);
             rightInput = Input.GetKey(KeyCode.RightArrow);
         }
+
+        if (Input.GetKey(KeyCode.Alpha1)) {
+            if (gameManager.currentPlaymode == GamePlay.SinglePlayer) return;
+            gameManager.currentPlaymode = GamePlay.SinglePlayer;
+            gameManager.Start();
+        }
+
+        if (Input.GetKey(KeyCode.Alpha2)) {
+            if (gameManager.currentPlaymode == GamePlay.DoublePlayer) return;
+            gameManager.currentPlaymode = GamePlay.DoublePlayer;
+            gameManager.Start();
+        }
     }
     
     void DoMovement()
     {
-        Vector3 newPos = Vector3.zero;
+        Vector3 movementDirection = Vector3.zero;
 
         if (forwardInput)
-            newPos += mainCamera.forwardVector * playerController.baseSpeed * Time.fixedDeltaTime;
+            movementDirection += mainCamera.forwardVector;
         else if (backwardInput)
-            newPos += mainCamera.forwardVector * playerController.baseSpeed * Time.fixedDeltaTime * -1;
+            movementDirection += mainCamera.forwardVector * -1;
 
         if (leftInput)
-            newPos += mainCamera.rightVector * playerController.baseSpeed * Time.fixedDeltaTime * -1;
+            movementDirection += mainCamera.rightVector * -1;
         else if (rightInput)
-            newPos += mainCamera.rightVector * playerController.baseSpeed * Time.fixedDeltaTime;
+            movementDirection += mainCamera.rightVector;
 
-        this.transform.position += newPos;
+        movementDirection = movementDirection.normalized;
+
+        playerRB.MovePosition(this.transform.position + movementDirection * playerController.baseSpeed * Time.deltaTime);
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -82,7 +99,9 @@ public class PlayerControlledState : State
 
             ballBehaviour = collision.gameObject.GetComponent<BallBehaviour>();
             Vector3 dir = Vector3.Normalize(this.transform.position - gameManager.currentBall.transform.position);
-            ballBehaviour.ReturnBall(dir, GetComponent<PlayerController>().currentTeam);
+            ballBehaviour.ReturnBall(dir, this.playerController);
+
+            this.playerRB.velocity = this.playerRB.velocity * 0.1f;
         }
     }
 }

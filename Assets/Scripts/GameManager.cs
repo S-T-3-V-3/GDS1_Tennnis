@@ -52,6 +52,7 @@ public class GameManager : MonoBehaviour
     public UnityEvent OnLevelStart;
     public TeamEvent OnPlayerScore;
     public UnityEvent OnRoundComplete;
+    public UnityEvent OnRoundBegin;
     public UnityEvent OnSetComplete;
     public UnityEvent OnGameComplete;
 
@@ -77,15 +78,20 @@ public class GameManager : MonoBehaviour
 
         AudioManager = GameObject.Instantiate(AudioPrefab);
 
-        OnRoundComplete.AddListener(StartNewRound);
-        OnSetComplete.AddListener(StartNewSet);
+        OnRoundComplete.AddListener(() => {
+            Invoke("StartNewRound",1f);
+        });
+
+        OnSetComplete.AddListener(() => {
+            Invoke("StartNewSet",1f);
+        });
         OnSetComplete.AddListener(TriggerPowerupSpawner);
         OnGameComplete.AddListener(ShowGameCompleted);
 
         hud.scoreBoard.gameManager = this;
     }
 
-    void Start()
+    public void Start()
     {
         SpawnPlayers();
         sessionData.StartGame();
@@ -101,13 +107,20 @@ public class GameManager : MonoBehaviour
     }
 
     void SpawnPlayers() {
+        if (player1Controller != null)
+            GameObject.Destroy(player1Controller.gameObject);
+
         player1Controller = CreateNewPlayer(PlayerSelection.Player1);
+
+        if (player2Controller != null)
+            GameObject.Destroy(player2Controller.gameObject);
+
         player2Controller = CreateNewPlayer(PlayerSelection.Player2, currentPlaymode == GamePlay.SinglePlayer);
     }
 
     PlayerController CreateNewPlayer(PlayerSelection playerNumber, bool isAIControlled = false) {
         PlayerController controller = GameObject.Instantiate(playerPrefab, player1Spawn.position, player1Spawn.rotation).GetComponent<PlayerController>();
-        PlayerColors color = SelectColor();
+        PlayerColors color = playerNumber == PlayerSelection.Player1 ? gameSettings.colorList[0] : gameSettings.colorList[1];
         
         controller.playerSelection = playerNumber;
         controller.SetColor(color);
@@ -119,14 +132,6 @@ public class GameManager : MonoBehaviour
             controller.SetState<PlayerControlledState>();
 
         return controller;
-    }
-
-    private PlayerColors SelectColor()
-    {
-        int selectionindex = 0;
-        PlayerColors selectedColor = playerColors[selectionindex];
-        playerColors.RemoveAt(selectionindex);
-        return selectedColor;
     }
 
     // Update is called once per frame
@@ -217,28 +222,34 @@ public class GameManager : MonoBehaviour
     void StartNewRound() {
         player1Controller.transform.position = player1Spawn.position;
         player1Controller.transform.rotation = player1Spawn.rotation;
+        player1Controller.SetCourtOwner();
 
         player2Controller.transform.position = player2Spawn.position;
         player2Controller.transform.rotation = player2Spawn.rotation;
+        player2Controller.SetCourtOwner();
 
         Team currentServer = sessionData.GetCurrentServer();
         Transform currentServerTransform = player1Controller.currentTeam == currentServer ? player1Controller.transform : player2Controller.transform;
+        
+        currentServerTransform.gameObject.GetComponent<PlayerController>().isServing = true;
 
         Vector3 ballSpawnPos = currentServerTransform.position + currentServerTransform.forward * gameSettings.ballSpawnDistance + new Vector3(0,0.4f,0);
         SpawnBall(ballSpawnPos);
+
+        OnRoundBegin.Invoke();
     }
 
     //Test Methods
     void ChangeCameraPositions()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        if (Input.GetKeyDown(KeyCode.Alpha3))
         {
             mainCamera.transform.position = cameraPosition1.position;
             mainCamera.transform.rotation = cameraPosition1.rotation;
 
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha2))
+        if (Input.GetKeyDown(KeyCode.Alpha4))
         {
             mainCamera.transform.position = cameraPosition2.position;
             mainCamera.transform.rotation = cameraPosition2.rotation;

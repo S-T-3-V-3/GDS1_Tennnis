@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public enum PlayerSelection
 {
@@ -16,7 +17,8 @@ public class PlayerController : MonoBehaviour
     public StateManager stateManager;
     public CameraController mainCamera;
 
-    public float baseSpeed = 3f;
+    public bool isServing = false;
+    public float baseSpeed = 0.3f;
 
     MeshRenderer playerRenderer;
     GameManager gameManager;
@@ -34,6 +36,14 @@ public class PlayerController : MonoBehaviour
     public void SetColor(PlayerColors color)
     {
         playerRenderer.material = color.playerColor;
+    }
+
+    public void SetCourtOwner() {
+        RaycastHit[] raycastHits = Physics.RaycastAll(this.transform.position,this.transform.up * -1).Where(x => x.collider.GetComponent<FloorCollision>() != null).ToArray();
+        
+        if (raycastHits.Length > 0) {
+            raycastHits.First().collider.GetComponent<FloorCollision>().owningPlayer = this;
+        }
     }
 
     public void SetState<T>() where T : State
