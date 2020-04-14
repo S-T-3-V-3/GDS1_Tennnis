@@ -41,6 +41,7 @@ public class BallBehaviour : MonoBehaviour
             ballRigidbody.velocity = Vector3.zero;
             ResetBounceCounter();
 
+            //Changes the x, y and z angle forces based on the player's z position and xDirectionalModifier
             switch (playerTransform.position.z)
             {
                 case float z when (z < -14):
@@ -84,10 +85,29 @@ public class BallBehaviour : MonoBehaviour
 
     }
 
-    //Attempts to ensure the ball wont get sent out of the court
+    //Changes the x-force to ensure the ball wont get sent out of the court
     private float CheckPositionX(Vector3 playerPosition, float standardForceX)
     {
-        return standardForceX;
+        float returnedForce = standardForceX;
+
+        switch (playerPosition.z)
+        {
+            //Mid z-field scenario
+            case float z when (z >= -14 && z < -7 || z >= 7 && z < 14):
+                returnedForce = standardForceX * 1.5f;
+                break;
+            
+            //Close z-field scenario
+            case float z when (z >= -7 && z < 7):
+                returnedForce = standardForceX * 2;
+                break;
+
+            //Far z-field scenario
+            default:
+                break;
+        }
+
+        return returnedForce;
     }
 
     // Once a point is scored, inform game manager of point update

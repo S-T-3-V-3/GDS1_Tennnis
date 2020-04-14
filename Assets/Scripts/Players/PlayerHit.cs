@@ -10,11 +10,6 @@ public class PlayerHit : MonoBehaviour
     //Taken in inspector window
     public GameObject playerModel;
 
-    private void Update()
-    {
-        Debug.Log(playerModel.transform.localRotation.y);
-    }
-
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.GetComponent<BallBehaviour>() == null) return;
