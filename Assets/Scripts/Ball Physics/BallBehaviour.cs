@@ -13,7 +13,7 @@ public class BallBehaviour : MonoBehaviour
     private float bounce = 0;
 
     //Stores the player number of the last ball hitter
-    private Team lastHitter = Team.BLUE;
+    private Team lastHitter;
 
     public enum PlayerPosition
     {
@@ -31,34 +31,63 @@ public class BallBehaviour : MonoBehaviour
     //Send the ball back to the other side. Detected in player hit collision
     public void ReturnBall(Transform playerTransform, float xDirectionModifier, Team currentTeam)
     {
-        if(!ballRigidbody.useGravity)
-            ballRigidbody.useGravity = true;
-
-        ballRigidbody.velocity = Vector3.zero;
-        ResetBounceCounter();
-
-        switch (playerTransform.position.z)
+        //Prevents the player from double hitting the ball by making it only hittable by the opposition
+        //If the ball is being server, useGravity will be disabled and the last hitter is irrelevant
+        if (lastHitter != currentTeam || !ballRigidbody.useGravity)
         {
-            case float z when (z < -14):
-                ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y, ballForces.z * playerTransform.forward.z));
-                break;
-            case float z when (z >= -14 && z < -7):
-                ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y / 1.5f, ballForces.z * playerTransform.forward.z));
-                break;
-            case float z when (z >= -7 && z < 0):
-                ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y / 2, ballForces.z * playerTransform.forward.z));
-                break;
-            case float z when (z >= 0 && z < 7):
-                ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y / 2, -ballForces.z * playerTransform.forward.z));
-                break;
-            case float z when (z >= 7 && z < 14):
-                ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y / 1.5f, -ballForces.z * playerTransform.forward.z));
-                break;
-            case float z when (z >= 14):
-                ballRigidbody.AddForce(new Vector3(ballForces.x * xDirectionModifier, ballForces.y, -ballForces.z * playerTransform.forward.z));  
-                break;
+            if (!ballRigidbody.useGravity)
+                ballRigidbody.useGravity = true;
+
+            ballRigidbody.velocity = Vector3.zero;
+            ResetBounceCounter();
+
+            switch (playerTransform.position.z)
+            {
+                case float z when (z < -14):
+                    ballRigidbody.AddForce(new Vector3(CheckPositionX(playerTransform.position, ballForces.x * xDirectionModifier),
+                        ballForces.y,
+                        ballForces.z * playerTransform.forward.z));
+                    break;
+
+                case float z when (z >= -14 && z < -7):
+                    ballRigidbody.AddForce(new Vector3(CheckPositionX(playerTransform.position, ballForces.x * xDirectionModifier),
+                        ballForces.y,
+                        ballForces.z * playerTransform.forward.z / 1.5f));
+                    break;
+
+                case float z when (z >= -7 && z < 0):
+                    ballRigidbody.AddForce(new Vector3(CheckPositionX(playerTransform.position, ballForces.x * xDirectionModifier),
+                        ballForces.y,
+                        ballForces.z * playerTransform.forward.z / 2));
+                    break;
+
+                case float z when (z >= 0 && z < 7):
+                    ballRigidbody.AddForce(new Vector3(CheckPositionX(playerTransform.position, ballForces.x * xDirectionModifier),
+                        ballForces.y,
+                        -ballForces.z * playerTransform.forward.z / 2));
+                    break;
+
+                case float z when (z >= 7 && z < 14):
+                    ballRigidbody.AddForce(new Vector3(CheckPositionX(playerTransform.position, ballForces.x * xDirectionModifier),
+                        ballForces.y,
+                        -ballForces.z * playerTransform.forward.z / 1.5f));
+                    break;
+
+                case float z when (z >= 14):
+                    ballRigidbody.AddForce(new Vector3(CheckPositionX(playerTransform.position, ballForces.x * xDirectionModifier),
+                        ballForces.y,
+                        -ballForces.z * playerTransform.forward.z));
+                    break;
+            }
+            lastHitter = currentTeam;
         }
-        lastHitter = currentTeam;
+
+    }
+
+    //Attempts to ensure the ball wont get sent out of the court
+    private float CheckPositionX(Vector3 playerPosition, float standardForceX)
+    {
+        return standardForceX;
     }
 
     // Once a point is scored, inform game manager of point update
@@ -101,7 +130,7 @@ public class BallBehaviour : MonoBehaviour
         //If the ball bounces twice on a player's side, give point to opposition
         if (bounce == 2)
         {
-            PointScored(lastHitter);
+            ScoreOpposition();
         }
     }
 
