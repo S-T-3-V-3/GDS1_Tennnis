@@ -45,37 +45,37 @@ public class BallBehaviour : MonoBehaviour
             switch (playerTransform.position.z)
             {
                 case float z when (z < -14):
-                    ballRigidbody.AddForce(new Vector3(CheckPositionX(playerTransform.position, ballForces.x * xDirectionModifier),
+                    ballRigidbody.AddForce(new Vector3(CheckPositionX(playerTransform.position, ballForces.x, xDirectionModifier),
                         ballForces.y,
                         ballForces.z * playerTransform.forward.z));
                     break;
 
                 case float z when (z >= -14 && z < -7):
-                    ballRigidbody.AddForce(new Vector3(CheckPositionX(playerTransform.position, ballForces.x * xDirectionModifier),
+                    ballRigidbody.AddForce(new Vector3(CheckPositionX(playerTransform.position, ballForces.x, xDirectionModifier),
                         ballForces.y,
                         ballForces.z * playerTransform.forward.z / 1.5f));
                     break;
 
                 case float z when (z >= -7 && z < 0):
-                    ballRigidbody.AddForce(new Vector3(CheckPositionX(playerTransform.position, ballForces.x * xDirectionModifier),
+                    ballRigidbody.AddForce(new Vector3(CheckPositionX(playerTransform.position, ballForces.x, xDirectionModifier),
                         ballForces.y,
                         ballForces.z * playerTransform.forward.z / 2));
                     break;
 
                 case float z when (z >= 0 && z < 7):
-                    ballRigidbody.AddForce(new Vector3(CheckPositionX(playerTransform.position, ballForces.x * xDirectionModifier),
+                    ballRigidbody.AddForce(new Vector3(CheckPositionX(playerTransform.position, ballForces.x, xDirectionModifier),
                         ballForces.y,
                         -ballForces.z * playerTransform.forward.z / 2));
                     break;
 
                 case float z when (z >= 7 && z < 14):
-                    ballRigidbody.AddForce(new Vector3(CheckPositionX(playerTransform.position, ballForces.x * xDirectionModifier),
+                    ballRigidbody.AddForce(new Vector3(CheckPositionX(playerTransform.position, ballForces.x, xDirectionModifier),
                         ballForces.y,
                         -ballForces.z * playerTransform.forward.z / 1.5f));
                     break;
 
                 case float z when (z >= 14):
-                    ballRigidbody.AddForce(new Vector3(CheckPositionX(playerTransform.position, ballForces.x * xDirectionModifier),
+                    ballRigidbody.AddForce(new Vector3(CheckPositionX(playerTransform.position, ballForces.x, xDirectionModifier),
                         ballForces.y,
                         -ballForces.z * playerTransform.forward.z));
                     break;
@@ -86,23 +86,43 @@ public class BallBehaviour : MonoBehaviour
     }
 
     //Changes the x-force to ensure the ball wont get sent out of the court
-    private float CheckPositionX(Vector3 playerPosition, float standardForceX)
+    private float CheckPositionX(Vector3 playerPosition, float ballForceX, float xDirectionModifier)
     {
-        float returnedForce = standardForceX;
+        float returnedForce = ballForceX * xDirectionModifier;
 
         switch (playerPosition.z)
         {
             //Mid z-field scenario
             case float z when (z >= -14 && z < -7 || z >= 7 && z < 14):
-                returnedForce = standardForceX * 1.5f;
+                returnedForce = ballForceX * xDirectionModifier * 1.5f;
                 break;
             
             //Close z-field scenario
             case float z when (z >= -7 && z < 7):
-                returnedForce = standardForceX * 2;
+                returnedForce = ballForceX * xDirectionModifier * 2;
                 break;
 
             //Far z-field scenario
+            default:
+                break;
+        }
+
+        //If player is on the edge and about to hit it out, set force to 0 instead
+        //If they're within the 6 range, reduce the force
+        switch (playerPosition.x)
+        {
+            case float x when (x <= -8 && xDirectionModifier < 0 && playerPosition.z < 0 ||
+            x >= 8 && xDirectionModifier > 0 && playerPosition.z < 0 ||
+            x <= -8 && xDirectionModifier < 0 && playerPosition.z > 0 ||
+            x >= 8 && xDirectionModifier > 0 && playerPosition.z > 0):
+                returnedForce = 0;
+                break;
+            case float x when (x <= -6 && xDirectionModifier < 0 && playerPosition.z < 0 ||
+            x >= 6 && xDirectionModifier > 0 && playerPosition.z < 0 ||
+            x <= -6 && xDirectionModifier < 0 && playerPosition.z > 0 ||
+            x >= 6 && xDirectionModifier > 0 && playerPosition.z > 0):
+                returnedForce = returnedForce / 1.5f;
+                break;
             default:
                 break;
         }
