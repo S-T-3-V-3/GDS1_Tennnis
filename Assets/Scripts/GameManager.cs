@@ -53,6 +53,10 @@ public class GameManager : MonoBehaviour
     public GameObject player2Prefab;
     public GameObject AiPlayerPrefab;
 
+    [Header("Audio Prefab")]
+    public GameObject AudioPrefab;
+    public GameObject AudioManager;
+
     [Header("Game Settings")]
     public GameSettings gameSettings;
 
@@ -90,6 +94,8 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        AudioManager = Instantiate(AudioPrefab) as GameObject;
+
         if (currentPlaymode == GamePlay.SinglePlayer)
             SinglePlayerSpawn();
         else
@@ -103,7 +109,7 @@ public class GameManager : MonoBehaviour
     {
         color1 = SelectColor();
         color2 = SelectColor();
-        GameObject ballInstance = Instantiate(ballPrefab) as GameObject;
+        GameObject ballInstance = Instantiate(ballPrefab, ballSpawnPos) as GameObject;
 
         player1 = Instantiate(player1Prefab, player1Spawn.position, player1Spawn.rotation) as GameObject;
         player1Controller = player1.GetComponent<PlayerController>();
@@ -125,7 +131,7 @@ public class GameManager : MonoBehaviour
     {
         color1 = SelectColor();
         color2 = SelectColor();
-        GameObject ballInstance = Instantiate(ballPrefab) as GameObject;
+        GameObject ballInstance = Instantiate(ballPrefab, ballSpawnPos) as GameObject;
 
         player1 = Instantiate(player1Prefab, player1Spawn.position, player1Spawn.rotation) as GameObject;
         player1Controller = player1.GetComponent<PlayerController>();

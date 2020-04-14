@@ -4,36 +4,17 @@ using UnityEngine;
 
 public class PlayerHit : MonoBehaviour
 {
-    public AudioSource audioSource;
     private BallBehaviour ballBehaviour;
     private float xDirectionModifier;
 
     //Taken in inspector window
     public GameObject playerModel;
 
-    void Start()
-    {
-        audioSource = GetComponent<AudioSource>();
-    }
-
-    //Used to help deterimine angle in which the ball was sent
-    /*private void Update()
-    {
-        if(playerModel.transform.position.z < 0)
-        {
-            Debug.Log("Player 1: " + playerModel.transform.localRotation);
-        }
-        else
-        {
-            Debug.Log("Player 2: " + playerModel.transform.localRotation);
-        }     
-    }*/
-
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.GetComponent<BallBehaviour>() == null) return;
         {
-            audioSource.Play();
+            GameManager.Instance.AudioManager.GetComponent<AudioManager>().PlaySound("Hit");
 
             ballBehaviour = collision.gameObject.GetComponent<BallBehaviour>();
 
@@ -47,7 +28,7 @@ public class PlayerHit : MonoBehaviour
             }
 
 
-            ballBehaviour.ReturnBall(this.transform, xDirectionModifier);
+            ballBehaviour.ReturnBall(this.transform, xDirectionModifier, GetComponent<PlayerController>().currentTeam);
         }
     }
 }

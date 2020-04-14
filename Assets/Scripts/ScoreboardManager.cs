@@ -9,25 +9,28 @@ public class ScoreboardManager : MonoBehaviour
     private bool stillScoring = true;
     
     //Stores the player number of the last ball hitter
-    private int lastHitter = 2;
+    private Team lastHitter = Team.BLUE;
+
+    public enum PlayerPosition
+    {
+        TopPosition,
+        BottomPosition
+    }
 
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
     }
 
-    public void PointScored(int lastHitter)
+    public void PointScored(Team pointScorer)
     {
         // ===================================
-        // This should be the param passed in
-        // instead of an integer
-        Team team = Team.BLUE;
         // The code below will then handle the
         // scoring/rest of game based on the
         // team that scored.
         // ===================================
 
-        GameManager.Instance.OnPlayerScore.Invoke(team);
+        GameManager.Instance.OnPlayerScore.Invoke(pointScorer);
 
         // ========================================
         //TODO: CHECK IF GAME POINT IS MADE
@@ -49,12 +52,9 @@ public class ScoreboardManager : MonoBehaviour
     }
 
     //Updates
-    public void PlayerOneHit(bool playerOneHit)
+    public void UpdateHitter(Team newHitter)
     {
-        if (playerOneHit)
-            lastHitter = 1;
-        else
-            lastHitter = 2;
+        lastHitter = newHitter;
     }
 
     public void AddBounceCounter(bool insideCourt, float zBallPosition)
@@ -65,10 +65,10 @@ public class ScoreboardManager : MonoBehaviour
             //If the ball lands outside the court without bouncing first, give opposition to the hitter the point
             if (!insideCourt && bounce < 2)
             {
-                if (lastHitter == 1)
-                    PointScored(lastHitter + 1);
+                if (lastHitter == Team.BLUE)
+                    PointScored(Team.RED);
                 else
-                    PointScored(lastHitter - 1);
+                    PointScored(Team.BLUE);
 
                 stillScoring = false;
             }
@@ -76,15 +76,13 @@ public class ScoreboardManager : MonoBehaviour
             //If ball doesn't make it over the net
             if (insideCourt && bounce < 2)
             {
-                if (lastHitter == 2 && zBallPosition > 0)
+                if (zBallPosition > 0 && GameManager.Instance.player1Prefab.transform.position.z > 0 ||
+                    zBallPosition < 0 && GameManager.Instance.player1Prefab.transform.position.z < 0)
                 {
-                    PointScored(lastHitter - 1);
-                    stillScoring = false;
-                }
-                    
-                else if (lastHitter == 1 && zBallPosition < 0)
-                {
-                    PointScored(lastHitter + 1);
+                    if(lastHitter == Team.RED)
+                        PointScored(Team.BLUE);
+                    else
+                        PointScored(Team.RED);
                     stillScoring = false;
                 }
             }
